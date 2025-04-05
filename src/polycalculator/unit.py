@@ -25,6 +25,8 @@ class Unit:
 class UnitTemplate(Enum):
     """All the default Polytopia units. For easy copying."""
 
+    DEFAULT_WARRIOR = Unit(2, 10, F(2), F(2), 1, 1, [T.DASH, T.FORTIFY])  # type: ignore
+
     # Normal
     WARRIOR = Unit(2, 10, F(2), F(2), 1, 1, [T.DASH, T.FORTIFY])  # type: ignore
     ARCHER = Unit(3, 10, F(2), F(1), 1, 2, [T.DASH, T.FORTIFY])  # type: ignore
@@ -177,20 +179,28 @@ class UnitBuilder:
         return cls.from_template(UnitTemplate.GIANT)
 
     @classmethod
-    def default_raft(cls) -> "UnitBuilder":
-        return cls.from_template(UnitTemplate.DEFAULT_RAFT)
+    def raft(cls, unit: UnitTemplate = UnitTemplate.DEFAULT_WARRIOR) -> "UnitBuilder":
+        return cls.from_template(UnitTemplate.DEFAULT_RAFT).with_max_hp(
+            unit.value.max_hp
+        )
 
     @classmethod
-    def default_scout(cls) -> "UnitBuilder":
-        return cls.from_template(UnitTemplate.DEFAULT_SCOUT)
+    def scout(cls, unit: UnitTemplate = UnitTemplate.DEFAULT_WARRIOR) -> "UnitBuilder":
+        return cls.from_template(UnitTemplate.DEFAULT_RAFT).with_max_hp(
+            unit.value.max_hp
+        )
 
     @classmethod
-    def default_rammer(cls) -> "UnitBuilder":
-        return cls.from_template(UnitTemplate.DEFAULT_RAMMER)
+    def rammer(cls, unit: UnitTemplate = UnitTemplate.DEFAULT_WARRIOR) -> "UnitBuilder":
+        return cls.from_template(UnitTemplate.DEFAULT_RAFT).with_max_hp(
+            unit.value.max_hp
+        )
 
     @classmethod
-    def default_bomber(cls) -> "UnitBuilder":
-        return cls.from_template(UnitTemplate.DEFAULT_BOMBER)
+    def bomber(cls, unit: UnitTemplate = UnitTemplate.DEFAULT_WARRIOR) -> "UnitBuilder":
+        return cls.from_template(UnitTemplate.DEFAULT_RAFT).with_max_hp(
+            unit.value.max_hp
+        )
 
     @classmethod
     def juggernaut(cls) -> "UnitBuilder":
