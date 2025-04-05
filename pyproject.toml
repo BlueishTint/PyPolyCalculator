@@ -1,0 +1,15 @@
+[project]
+name = "polycalculator"
+version = "0.1.0"
+description = "Python version of the PolyCalculator bot. Currently unfinished."
+readme = "README.md"
+authors = [{ name = "BlueishTint", email = "bluetintisacolor@gmail.com" }]
+requires-python = ">=3.13"
+dependencies = ["attrs>=25.3.0"]
+
+[project.scripts]
+polycalculator = "polycalculator:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
