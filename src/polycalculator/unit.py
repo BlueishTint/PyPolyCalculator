@@ -15,7 +15,7 @@ class Unit:
     movement: int
     range: int
     traits: list[T]
-    current_hp: F = field(default=None)
+    current_hp: F = field()
 
     @current_hp.default  # type: ignore[attr-defined]
     def _default_current_hp(self):
@@ -26,13 +26,13 @@ class UnitTemplate(Enum):
     """All the default Polytopia units. For easy copying."""
 
     # Normal
-    WARRIOR = Unit(2, 10, F(2), F(2), 1, 1, [T.DASH, T.FORTIFY])
-    ARCHER = Unit(3, 10, F(2), F(1), 1, 2, [T.DASH, T.FORTIFY])
-    RIDER = Unit(3, 10, F(2), F(1), 2, 1, [T.DASH, T.ESCAPE, T.FORTIFY])
-    CATAPULT = Unit(8, 10, F(4), F(0), 1, 3, [T.STIFF])
-    KNIGHT = Unit(8, 10, F(7, 2), F(1), 3, 1, [T.DASH, T.PERSIST, T.FORTIFY])
-    SWORDSMAN = Unit(5, 15, F(3), F(3), 1, 1, [T.DASH])
-    DEFENDER = Unit(3, 15, F(1), F(3), 1, 1, [T.FORTIFY])
+    WARRIOR = Unit(2, 10, F(2), F(2), 1, 1, [T.DASH, T.FORTIFY])  # type: ignore
+    ARCHER = Unit(3, 10, F(2), F(1), 1, 2, [T.DASH, T.FORTIFY])  # type: ignore
+    RIDER = Unit(3, 10, F(2), F(1), 2, 1, [T.DASH, T.ESCAPE, T.FORTIFY])  # type: ignore
+    CATAPULT = Unit(8, 10, F(4), F(0), 1, 3, [T.STIFF])  # type: ignore
+    KNIGHT = Unit(8, 10, F(7, 2), F(1), 3, 1, [T.DASH, T.PERSIST, T.FORTIFY])  # type: ignore
+    SWORDSMAN = Unit(5, 15, F(3), F(3), 1, 1, [T.DASH])  # type: ignore
+    DEFENDER = Unit(3, 15, F(1), F(3), 1, 1, [T.FORTIFY])  # type: ignore
     CLOAK = Unit(
         8,
         5,
@@ -40,54 +40,84 @@ class UnitTemplate(Enum):
         F(1, 2),
         2,
         1,
-        [T.HIDE, T.INFILTRATE, T.DASH, T.SCOUT, T.CREEP, T.STATIC, T.STIFF],
+        [T.HIDE, T.INFILTRATE, T.DASH, T.SCOUT, T.CREEP, T.STATIC, T.STIFF],  # type: ignore
     )
     DAGGER = Unit(
-        2, 10, F(2), F(1), 1, 1, [T.SURPRISE, T.DASH, T.INDEPENDENT, T.STATIC]
+        2,
+        10,
+        F(2),
+        F(1),
+        1,
+        1,
+        [T.SURPRISE, T.DASH, T.INDEPENDENT, T.STATIC],  # type: ignore
     )
-    MIND_BENDER = Unit(5, 10, F(0), F(1), 1, 1, [T.HEAL, T.CONVERT, T.STIFF])
-    GIANT = Unit(10, 40, F(5), F(4), 1, 1, [T.STATIC])
+    MIND_BENDER = Unit(5, 10, F(0), F(1), 1, 1, [T.HEAL, T.CONVERT, T.STIFF])  # type: ignore
+    GIANT = Unit(10, 40, F(5), F(4), 1, 1, [T.STATIC])  # type: ignore
     # Naval
-    DEFAULT_RAFT = Unit(2, 10, F(0), F(2), 2, 0, [T.CARRY, T.STATIC, T.STIFF])
-    DEFAULT_SCOUT = Unit(7, 10, F(2), F(1), 3, 2, [T.DASH, T.CARRY, T.SCOUT, T.STATIC])
-    DEFAULT_RAMMER = Unit(7, 10, F(3), F(3), 3, 1, [T.DASH, T.CARRY, T.STATIC])
+    DEFAULT_RAFT = Unit(2, 10, F(0), F(2), 2, 0, [T.CARRY, T.STATIC, T.STIFF])  # type: ignore
+    DEFAULT_SCOUT = Unit(7, 10, F(2), F(1), 3, 2, [T.DASH, T.CARRY, T.SCOUT, T.STATIC])  # type: ignore
+    DEFAULT_RAMMER = Unit(7, 10, F(3), F(3), 3, 1, [T.DASH, T.CARRY, T.STATIC])  # type: ignore
     DEFAULT_BOMBER = Unit(
-        17, 10, F(3), F(2), 2, 3, [T.CARRY, T.SPLASH, T.STATIC, T.STIFF]
+        17,
+        10,
+        F(3),
+        F(2),
+        2,
+        3,
+        [T.CARRY, T.SPLASH, T.STATIC, T.STIFF],  # type: ignore
     )
-    JUGGERNAUT = Unit(10, 40, F(4), F(4), 2, 1, [T.CARRY, T.STATIC, T.STIFF, T.STOMP])
+    JUGGERNAUT = Unit(10, 40, F(4), F(4), 2, 1, [T.CARRY, T.STATIC, T.STIFF, T.STOMP])  # type: ignore
     PIRATE = Unit(
-        2, 10, F(2), F(1), 2, 1, [T.SURPRISE, T.DASH, T.INDEPENDENT, T.STATIC]
+        2,
+        10,
+        F(2),
+        F(1),
+        2,
+        1,
+        [T.SURPRISE, T.DASH, T.INDEPENDENT, T.STATIC],  # type: ignore
     )
     # Aquarion
-    TRIDENTION = Unit(8, 10, F(5, 2), F(1), 2, 2, [T.DASH, T.PERSIST])
-    SHARK = Unit(8, 10, F(7, 2), F(2), 3, 1, [T.DASH, T.SURPRISE])
-    JELLY = Unit(8, 20, F(2), F(2), 2, 1, [T.TENTACLES, T.STIFF, T.STATIC])
-    PUFFER = Unit(8, 10, F(4), F(0), 2, 3, [T.DRENCH])
-    CRAB = Unit(10, 40, F(4), F(4), 2, 1, [T.ESCAPE, T.AUTOFLOOD, T.STATIC])
+    TRIDENTION = Unit(8, 10, F(5, 2), F(1), 2, 2, [T.DASH, T.PERSIST])  # type: ignore
+    SHARK = Unit(8, 10, F(7, 2), F(2), 3, 1, [T.DASH, T.SURPRISE])  # type: ignore
+    JELLY = Unit(8, 20, F(2), F(2), 2, 1, [T.TENTACLES, T.STIFF, T.STATIC])  # type: ignore
+    PUFFER = Unit(8, 10, F(4), F(0), 2, 3, [T.DRENCH])  # type: ignore
+    CRAB = Unit(10, 40, F(4), F(4), 2, 1, [T.ESCAPE, T.AUTOFLOOD, T.STATIC])  # type: ignore
     # Elyrion
     POLYTAUR = Unit(
-        3, 15, F(3), F(1), 1, 1, [T.DASH, T.INDEPENDENT, T.FORTIFY, T.STATIC]
+        3,
+        15,
+        F(3),
+        F(1),
+        1,
+        1,
+        [T.DASH, T.INDEPENDENT, T.FORTIFY, T.STATIC],  # type: ignore
     )
-    EGG = Unit(10, 10, F(0), F(2), 1, 1, [T.GROW, T.FORTIFY, T.STIFF, T.STATIC])
+    EGG = Unit(10, 10, F(0), F(2), 1, 1, [T.GROW, T.FORTIFY, T.STIFF, T.STATIC])  # type: ignore
     BABY_DRAGON = Unit(
-        10, 15, F(3), F(3), 2, 1, [T.GROW, T.DASH, T.ESCAPE, T.SCOUT, T.STATIC]
+        10,
+        15,
+        F(3),
+        F(3),
+        2,
+        1,
+        [T.GROW, T.DASH, T.ESCAPE, T.SCOUT, T.STATIC],  # type: ignore
     )
-    FIRE_DRAGON = Unit(10, 20, F(4), F(3), 3, 2, [T.DASH, T.SPLASH, T.SCOUT, T.STATIC])
+    FIRE_DRAGON = Unit(10, 20, F(4), F(3), 3, 2, [T.DASH, T.SPLASH, T.SCOUT, T.STATIC])  # type: ignore
     # Polaris
-    MOONI = Unit(5, 10, F(0), F(1), 1, 1, [T.AUTO_FREEZE, T.SKATE, T.STIFF, T.STATIC])
-    ICE_ARCHER = Unit(3, 10, F(0), F(1), 1, 2, [T.DASH, T.FREEZE, T.FORTIFY, T.STIFF])
-    BATTLE_SLED = Unit(5, 15, F(3), F(2), 2, 1, [T.DASH, T.ESCAPE, T.SKATE])
-    ICE_FORTRESS = Unit(15, 20, F(4), F(3), 1, 2, [T.SKATE, T.SCOUT])
-    GAAMI = Unit(10, 30, F(4), F(3), 1, 1, [T.AUTO_FREEZE, T.FREEZE_AREA, T.STATIC])
+    MOONI = Unit(5, 10, F(0), F(1), 1, 1, [T.AUTO_FREEZE, T.SKATE, T.STIFF, T.STATIC])  # type: ignore
+    ICE_ARCHER = Unit(3, 10, F(0), F(1), 1, 2, [T.DASH, T.FREEZE, T.FORTIFY, T.STIFF])  # type: ignore
+    BATTLE_SLED = Unit(5, 15, F(3), F(2), 2, 1, [T.DASH, T.ESCAPE, T.SKATE])  # type: ignore
+    ICE_FORTRESS = Unit(15, 20, F(4), F(3), 1, 2, [T.SKATE, T.SCOUT])  # type: ignore
+    GAAMI = Unit(10, 30, F(4), F(3), 1, 1, [T.AUTO_FREEZE, T.FREEZE_AREA, T.STATIC])  # type: ignore
     # Cymanti
-    HEXAPOD = Unit(3, 5, F(3), F(1), 2, 1, [T.DASH, T.ESCAPE, T.SNEAK, T.CREEP])
-    DOOMUX = Unit(10, 20, F(4), F(2), 3, 1, [T.DASH, T.CREEP, T.EXPLODE])
-    KITON = Unit(3, 15, F(1), F(3), 1, 1, [T.POISON])
-    PHYCHI = Unit(3, 15, F(1), F(1), 2, 2, [T.DASH, T.POISON, T.SURPRISE])
-    SHAMAN = Unit(5, 10, F(1), F(1), 1, 1, [T.CONVERT, T.BOOST, T.STATIC])
-    EXIDA = Unit(8, 10, F(3), F(1), 1, 3, [T.POISON, T.SPLASH])
-    CENTIPEDE = Unit(10, 20, F(4), F(3), 2, 1, [T.DASH, T.EAT, T.CREEP, T.STATIC])
-    SEGMENT = Unit(1, 10, F(4), F(3), 2, 1, [T.DASH, T.EAT, T.CREEP, T.STATIC])
+    HEXAPOD = Unit(3, 5, F(3), F(1), 2, 1, [T.DASH, T.ESCAPE, T.SNEAK, T.CREEP])  # type: ignore
+    DOOMUX = Unit(10, 20, F(4), F(2), 3, 1, [T.DASH, T.CREEP, T.EXPLODE])  # type: ignore
+    KITON = Unit(3, 15, F(1), F(3), 1, 1, [T.POISON])  # type: ignore
+    PHYCHI = Unit(3, 15, F(1), F(1), 2, 2, [T.DASH, T.POISON, T.SURPRISE])  # type: ignore
+    SHAMAN = Unit(5, 10, F(1), F(1), 1, 1, [T.CONVERT, T.BOOST, T.STATIC])  # type: ignore
+    EXIDA = Unit(8, 10, F(3), F(1), 1, 3, [T.POISON, T.SPLASH])  # type: ignore
+    CENTIPEDE = Unit(10, 20, F(4), F(3), 2, 1, [T.DASH, T.EAT, T.CREEP, T.STATIC])  # type: ignore
+    SEGMENT = Unit(1, 10, F(4), F(3), 2, 1, [T.DASH, T.EAT, T.CREEP, T.STATIC])  # type: ignore
 
 
 class UnitBuilder:
