@@ -11,10 +11,10 @@ Good question. There are two answers:
 ## Roadmap
 
 - [x] Unit representation
-- [] Single combat
-- [] Multiple combat
-- [] A* graph to find optimal order
-- [] Discord bot
-- [] /c and /o commands
-- [] /units command
-- [] /e and /b commands
+- [ ] Single combat
+- [ ] Multiple combat
+- [ ] A* graph to find optimal order
+- [ ] Discord bot
+- [ ] /c and /o commands
+- [ ] /units command
+- [ ] /e and /b commands
