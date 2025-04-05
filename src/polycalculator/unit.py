@@ -25,101 +25,373 @@ class Unit:
 class UnitTemplate(Enum):
     """All the default Polytopia units. For easy copying."""
 
-    DEFAULT_WARRIOR = Unit(2, 10, F(2), F(2), 1, 1, [T.DASH, T.FORTIFY])  # type: ignore
+    DEFAULT_WARRIOR = Unit(
+        cost=2,
+        max_hp=10,
+        attack=F(2),
+        defense=F(2),
+        movement=1,
+        range=1,
+        traits=[T.DASH, T.FORTIFY],
+    )  # type: ignore
 
     # Normal
-    WARRIOR = Unit(2, 10, F(2), F(2), 1, 1, [T.DASH, T.FORTIFY])  # type: ignore
-    ARCHER = Unit(3, 10, F(2), F(1), 1, 2, [T.DASH, T.FORTIFY])  # type: ignore
-    RIDER = Unit(3, 10, F(2), F(1), 2, 1, [T.DASH, T.ESCAPE, T.FORTIFY])  # type: ignore
-    CATAPULT = Unit(8, 10, F(4), F(0), 1, 3, [T.STIFF])  # type: ignore
-    KNIGHT = Unit(8, 10, F(7, 2), F(1), 3, 1, [T.DASH, T.PERSIST, T.FORTIFY])  # type: ignore
-    SWORDSMAN = Unit(5, 15, F(3), F(3), 1, 1, [T.DASH])  # type: ignore
-    DEFENDER = Unit(3, 15, F(1), F(3), 1, 1, [T.FORTIFY])  # type: ignore
+    WARRIOR = Unit(
+        cost=2,
+        max_hp=10,
+        attack=F(2),
+        defense=F(2),
+        movement=1,
+        range=1,
+        traits=[T.DASH, T.FORTIFY],
+    )  # type: ignore
+    ARCHER = Unit(
+        cost=3,
+        max_hp=10,
+        attack=F(2),
+        defense=F(1),
+        movement=1,
+        range=2,
+        traits=[T.DASH, T.FORTIFY],
+    )  # type: ignore
+    RIDER = Unit(
+        cost=3,
+        max_hp=10,
+        attack=F(2),
+        defense=F(1),
+        movement=2,
+        range=1,
+        traits=[T.DASH, T.ESCAPE, T.FORTIFY],
+    )  # type: ignore
+    CATAPULT = Unit(
+        cost=8,
+        max_hp=10,
+        attack=F(4),
+        defense=F(0),
+        movement=1,
+        range=3,
+        traits=[T.STIFF],
+    )  # type: ignore
+    KNIGHT = Unit(
+        cost=8,
+        max_hp=10,
+        attack=F(7, 2),
+        defense=F(1),
+        movement=3,
+        range=1,
+        traits=[T.DASH, T.PERSIST, T.FORTIFY],
+    )  # type: ignore
+    SWORDSMAN = Unit(
+        cost=5,
+        max_hp=15,
+        attack=F(3),
+        defense=F(3),
+        movement=1,
+        range=1,
+        traits=[T.DASH],
+    )  # type: ignore
+    DEFENDER = Unit(
+        cost=3,
+        max_hp=15,
+        attack=F(1),
+        defense=F(3),
+        movement=1,
+        range=1,
+        traits=[T.FORTIFY],
+    )  # type: ignore
     CLOAK = Unit(
-        8,
-        5,
-        F(2),
-        F(1, 2),
-        2,
-        1,
-        [T.HIDE, T.INFILTRATE, T.DASH, T.SCOUT, T.CREEP, T.STATIC, T.STIFF],  # type: ignore
+        cost=8,
+        max_hp=5,
+        attack=F(2),
+        defense=F(1, 2),
+        movement=2,
+        range=1,
+        traits=[T.HIDE, T.INFILTRATE, T.DASH, T.SCOUT, T.CREEP, T.STATIC, T.STIFF],  # type: ignore
     )
     DAGGER = Unit(
-        2,
-        10,
-        F(2),
-        F(1),
-        1,
-        1,
-        [T.SURPRISE, T.DASH, T.INDEPENDENT, T.STATIC],  # type: ignore
+        cost=2,
+        max_hp=10,
+        attack=F(2),
+        defense=F(1),
+        movement=1,
+        range=1,
+        traits=[T.SURPRISE, T.DASH, T.INDEPENDENT, T.STATIC],  # type: ignore
     )
-    MIND_BENDER = Unit(5, 10, F(0), F(1), 1, 1, [T.HEAL, T.CONVERT, T.STIFF])  # type: ignore
-    GIANT = Unit(10, 40, F(5), F(4), 1, 1, [T.STATIC])  # type: ignore
+    MIND_BENDER = Unit(
+        cost=5,
+        max_hp=10,
+        attack=F(0),
+        defense=F(1),
+        movement=1,
+        range=1,
+        traits=[T.HEAL, T.CONVERT, T.STIFF],
+    )  # type: ignore
+    GIANT = Unit(
+        cost=10,
+        max_hp=40,
+        attack=F(5),
+        defense=F(4),
+        movement=1,
+        range=1,
+        traits=[T.STATIC],
+    )  # type: ignore
     # Naval
-    DEFAULT_RAFT = Unit(2, 10, F(0), F(2), 2, 0, [T.CARRY, T.STATIC, T.STIFF])  # type: ignore
-    DEFAULT_SCOUT = Unit(7, 10, F(2), F(1), 3, 2, [T.DASH, T.CARRY, T.SCOUT, T.STATIC])  # type: ignore
-    DEFAULT_RAMMER = Unit(7, 10, F(3), F(3), 3, 1, [T.DASH, T.CARRY, T.STATIC])  # type: ignore
+    DEFAULT_RAFT = Unit(
+        cost=2,
+        max_hp=10,
+        attack=F(0),
+        defense=F(2),
+        movement=2,
+        range=0,
+        traits=[T.CARRY, T.STATIC, T.STIFF],
+    )  # type: ignore
+    DEFAULT_SCOUT = Unit(
+        cost=7,
+        max_hp=10,
+        attack=F(2),
+        defense=F(1),
+        movement=3,
+        range=2,
+        traits=[T.DASH, T.CARRY, T.SCOUT, T.STATIC],
+    )  # type: ignore
+    DEFAULT_RAMMER = Unit(
+        cost=7,
+        max_hp=10,
+        attack=F(3),
+        defense=F(3),
+        movement=3,
+        range=1,
+        traits=[T.DASH, T.CARRY, T.STATIC],
+    )  # type: ignore
     DEFAULT_BOMBER = Unit(
-        17,
-        10,
-        F(3),
-        F(2),
-        2,
-        3,
-        [T.CARRY, T.SPLASH, T.STATIC, T.STIFF],  # type: ignore
+        cost=17,
+        max_hp=10,
+        attack=F(3),
+        defense=F(2),
+        movement=2,
+        range=3,
+        traits=[T.CARRY, T.SPLASH, T.STATIC, T.STIFF],  # type: ignore
     )
-    JUGGERNAUT = Unit(10, 40, F(4), F(4), 2, 1, [T.CARRY, T.STATIC, T.STIFF, T.STOMP])  # type: ignore
+    JUGGERNAUT = Unit(
+        cost=10,
+        max_hp=40,
+        attack=F(4),
+        defense=F(4),
+        movement=2,
+        range=1,
+        traits=[T.CARRY, T.STATIC, T.STIFF, T.STOMP],
+    )  # type: ignore
     PIRATE = Unit(
-        2,
-        10,
-        F(2),
-        F(1),
-        2,
-        1,
-        [T.SURPRISE, T.DASH, T.INDEPENDENT, T.STATIC],  # type: ignore
+        cost=2,
+        max_hp=10,
+        attack=F(2),
+        defense=F(1),
+        movement=2,
+        range=1,
+        traits=[T.SURPRISE, T.DASH, T.INDEPENDENT, T.STATIC],  # type: ignore
     )
     # Aquarion
-    TRIDENTION = Unit(8, 10, F(5, 2), F(1), 2, 2, [T.DASH, T.PERSIST])  # type: ignore
-    SHARK = Unit(8, 10, F(7, 2), F(2), 3, 1, [T.DASH, T.SURPRISE])  # type: ignore
-    JELLY = Unit(8, 20, F(2), F(2), 2, 1, [T.TENTACLES, T.STIFF, T.STATIC])  # type: ignore
-    PUFFER = Unit(8, 10, F(4), F(0), 2, 3, [T.DRENCH])  # type: ignore
-    CRAB = Unit(10, 40, F(4), F(4), 2, 1, [T.ESCAPE, T.AUTOFLOOD, T.STATIC])  # type: ignore
+    TRIDENTION = Unit(
+        cost=8,
+        max_hp=10,
+        attack=F(5, 2),
+        defense=F(1),
+        movement=2,
+        range=2,
+        traits=[T.DASH, T.PERSIST],
+    )  # type: ignore
+    SHARK = Unit(
+        cost=8,
+        max_hp=10,
+        attack=F(7, 2),
+        defense=F(2),
+        movement=3,
+        range=1,
+        traits=[T.DASH, T.SURPRISE],
+    )  # type: ignore
+    JELLY = Unit(
+        cost=8,
+        max_hp=20,
+        attack=F(2),
+        defense=F(2),
+        movement=2,
+        range=1,
+        traits=[T.TENTACLES, T.STIFF, T.STATIC],
+    )  # type: ignore
+    PUFFER = Unit(
+        cost=8,
+        max_hp=10,
+        attack=F(4),
+        defense=F(0),
+        movement=2,
+        range=3,
+        traits=[T.DRENCH],
+    )  # type: ignore
+    CRAB = Unit(
+        cost=10,
+        max_hp=40,
+        attack=F(4),
+        defense=F(4),
+        movement=2,
+        range=1,
+        traits=[T.ESCAPE, T.AUTOFLOOD, T.STATIC],
+    )  # type: ignore
     # Elyrion
     POLYTAUR = Unit(
-        3,
-        15,
-        F(3),
-        F(1),
-        1,
-        1,
-        [T.DASH, T.INDEPENDENT, T.FORTIFY, T.STATIC],  # type: ignore
+        cost=3,
+        max_hp=15,
+        attack=F(3),
+        defense=F(1),
+        movement=1,
+        range=1,
+        traits=[T.DASH, T.INDEPENDENT, T.FORTIFY, T.STATIC],  # type: ignore
     )
-    EGG = Unit(10, 10, F(0), F(2), 1, 1, [T.GROW, T.FORTIFY, T.STIFF, T.STATIC])  # type: ignore
+    EGG = Unit(
+        cost=10,
+        max_hp=10,
+        attack=F(0),
+        defense=F(2),
+        movement=1,
+        range=1,
+        traits=[T.GROW, T.FORTIFY, T.STIFF, T.STATIC],
+    )  # type: ignore
     BABY_DRAGON = Unit(
-        10,
-        15,
-        F(3),
-        F(3),
-        2,
-        1,
-        [T.GROW, T.DASH, T.ESCAPE, T.SCOUT, T.STATIC],  # type: ignore
+        cost=10,
+        max_hp=15,
+        attack=F(3),
+        defense=F(3),
+        movement=2,
+        range=1,
+        traits=[T.GROW, T.DASH, T.ESCAPE, T.SCOUT, T.STATIC],  # type: ignore
     )
-    FIRE_DRAGON = Unit(10, 20, F(4), F(3), 3, 2, [T.DASH, T.SPLASH, T.SCOUT, T.STATIC])  # type: ignore
+    FIRE_DRAGON = Unit(
+        cost=10,
+        max_hp=20,
+        attack=F(4),
+        defense=F(3),
+        movement=3,
+        range=2,
+        traits=[T.DASH, T.SPLASH, T.SCOUT, T.STATIC],  # type: ignore
+    )
     # Polaris
-    MOONI = Unit(5, 10, F(0), F(1), 1, 1, [T.AUTO_FREEZE, T.SKATE, T.STIFF, T.STATIC])  # type: ignore
-    ICE_ARCHER = Unit(3, 10, F(0), F(1), 1, 2, [T.DASH, T.FREEZE, T.FORTIFY, T.STIFF])  # type: ignore
-    BATTLE_SLED = Unit(5, 15, F(3), F(2), 2, 1, [T.DASH, T.ESCAPE, T.SKATE])  # type: ignore
-    ICE_FORTRESS = Unit(15, 20, F(4), F(3), 1, 2, [T.SKATE, T.SCOUT])  # type: ignore
-    GAAMI = Unit(10, 30, F(4), F(3), 1, 1, [T.AUTO_FREEZE, T.FREEZE_AREA, T.STATIC])  # type: ignore
+    MOONI = Unit(
+        cost=5,
+        max_hp=10,
+        attack=F(0),
+        defense=F(1),
+        movement=1,
+        range=1,
+        traits=[T.AUTO_FREEZE, T.SKATE, T.STIFF, T.STATIC],
+    )  # type: ignore
+    ICE_ARCHER = Unit(
+        cost=3,
+        max_hp=10,
+        attack=F(0),
+        defense=F(1),
+        movement=1,
+        range=2,
+        traits=[T.DASH, T.FREEZE, T.FORTIFY, T.STIFF],
+    )  # type: ignore
+    BATTLE_SLED = Unit(
+        cost=5,
+        max_hp=15,
+        attack=F(3),
+        defense=F(2),
+        movement=2,
+        range=1,
+        traits=[T.DASH, T.ESCAPE, T.SKATE],
+    )  # type: ignore
+    ICE_FORTRESS = Unit(
+        cost=15,
+        max_hp=20,
+        attack=F(4),
+        defense=F(3),
+        movement=1,
+        range=2,
+        traits=[T.SKATE, T.SCOUT],
+    )  # type: ignore
+    GAAMI = Unit(
+        cost=10,
+        max_hp=30,
+        attack=F(4),
+        defense=F(3),
+        movement=1,
+        range=1,
+        traits=[T.AUTO_FREEZE, T.FREEZE_AREA, T.STATIC],
+    )  # type: ignore
     # Cymanti
-    HEXAPOD = Unit(3, 5, F(3), F(1), 2, 1, [T.DASH, T.ESCAPE, T.SNEAK, T.CREEP])  # type: ignore
-    DOOMUX = Unit(10, 20, F(4), F(2), 3, 1, [T.DASH, T.CREEP, T.EXPLODE])  # type: ignore
-    KITON = Unit(3, 15, F(1), F(3), 1, 1, [T.POISON])  # type: ignore
-    PHYCHI = Unit(3, 15, F(1), F(1), 2, 2, [T.DASH, T.POISON, T.SURPRISE])  # type: ignore
-    SHAMAN = Unit(5, 10, F(1), F(1), 1, 1, [T.CONVERT, T.BOOST, T.STATIC])  # type: ignore
-    EXIDA = Unit(8, 10, F(3), F(1), 1, 3, [T.POISON, T.SPLASH])  # type: ignore
-    CENTIPEDE = Unit(10, 20, F(4), F(3), 2, 1, [T.DASH, T.EAT, T.CREEP, T.STATIC])  # type: ignore
-    SEGMENT = Unit(1, 10, F(4), F(3), 2, 1, [T.DASH, T.EAT, T.CREEP, T.STATIC])  # type: ignore
+    HEXAPOD = Unit(
+        cost=3,
+        max_hp=5,
+        attack=F(3),
+        defense=F(1),
+        movement=2,
+        range=1,
+        traits=[T.DASH, T.ESCAPE, T.SNEAK, T.CREEP],
+    )  # type: ignore
+    DOOMUX = Unit(
+        cost=10,
+        max_hp=20,
+        attack=F(4),
+        defense=F(2),
+        movement=3,
+        range=1,
+        traits=[T.DASH, T.CREEP, T.EXPLODE],
+    )  # type: ignore
+    KITON = Unit(
+        cost=3,
+        max_hp=15,
+        attack=F(1),
+        defense=F(3),
+        movement=1,
+        range=1,
+        traits=[T.POISON],
+    )  # type: ignore
+    PHYCHI = Unit(
+        cost=3,
+        max_hp=15,
+        attack=F(1),
+        defense=F(1),
+        movement=2,
+        range=2,
+        traits=[T.DASH, T.POISON, T.SURPRISE],
+    )  # type: ignore
+    SHAMAN = Unit(
+        cost=5,
+        max_hp=10,
+        attack=F(1),
+        defense=F(1),
+        movement=1,
+        range=1,
+        traits=[T.CONVERT, T.BOOST, T.STATIC],
+    )  # type: ignore
+    EXIDA = Unit(
+        cost=8,
+        max_hp=10,
+        attack=F(3),
+        defense=F(1),
+        movement=1,
+        range=3,
+        traits=[T.POISON, T.SPLASH],
+    )  # type: ignore
+    CENTIPEDE = Unit(
+        cost=10,
+        max_hp=20,
+        attack=F(4),
+        defense=F(3),
+        movement=2,
+        range=1,
+        traits=[T.DASH, T.EAT, T.CREEP, T.STATIC],
+    )  # type: ignore
+    SEGMENT = Unit(
+        cost=1,
+        max_hp=10,
+        attack=F(4),
+        defense=F(3),
+        movement=2,
+        range=1,
+        traits=[T.DASH, T.EAT, T.CREEP, T.STATIC],
+    )  # type: ignore
 
 
 class UnitBuilder:
