@@ -1,3 +1,5 @@
+"""Contains all code to define Units and ways to create them."""
+
 from collections.abc import Iterable
 from copy import deepcopy
 from enum import Enum
@@ -8,6 +10,33 @@ from attrs import define, field
 
 @define(slots=True)
 class Unit:
+    """
+    A Polytopia unit.
+
+    When initializing a `Unit`, `current_hp` is automatically set to `max_hp` unless otherwise specified.
+
+    Attributes
+    ----------
+    cost : int
+        The cost of the unit in stars.
+    max_hp : int
+        The maximum hit points of the unit.
+    attack : Fraction
+        The attack stat of the unit.
+    defense : Fraction
+        The defense stat of the unit.
+    movement : int
+        The movement stat of the unit.
+    range : int
+        The range stat of the unit.
+    traits : list[Trait]
+        A list of traits the unit has.
+    current_hp : Fraction
+        The current hit points of the unit.
+        Defaults to `max_hp`.
+
+    """
+
     cost: int
     max_hp: int
     attack: F
@@ -23,7 +52,7 @@ class Unit:
 
 
 class UnitTemplate(Enum):
-    """All the default Polytopia units. For easy copying."""
+    """All the default Polytopia units."""
 
     DEFAULT_WARRIOR = Unit(
         cost=2,
@@ -395,7 +424,33 @@ class UnitTemplate(Enum):
 
 
 class UnitBuilder:
+    """
+    A builder class for creating and customizing `Unit` objects.
+
+    This class provides a fluent interface to configure various attributes
+    and traits of a `Unit` before instantiation.
+
+    Attributes
+    ----------
+    _unit : Unit
+        A deep copy of the base unit to be customized.
+    _current_hp_set : bool
+        Flag indicating if the current HP has been explicitly set.
+    _defense_bonus : Fraction
+        Modifier applied to the unit's defense.
+    _poisoned : bool
+        Flag indicating if the unit is poisoned.
+    """
+
     def __init__(self, base: Unit):
+        """
+        Initialize the UnitBuilder with a base unit.
+
+        Parameters
+        ----------
+        base : Unit
+            The base unit to be used as a template for building.
+        """
         self._unit = deepcopy(base)
         self._current_hp_set = False
         self._defense_bonus = F(1)
@@ -404,228 +459,715 @@ class UnitBuilder:
     # region sugar
     @classmethod
     def from_template(cls, template: UnitTemplate) -> "UnitBuilder":
+        """
+        Create a UnitBuilder from a unit template.
+
+        Parameters
+        ----------
+        template : UnitTemplate
+            The template to create the unit from.
+
+        Returns
+        -------
+        UnitBuilder
+            An instance of UnitBuilder initialized with the template's unit.
+        """
         return cls(template.value)
 
     @classmethod
     def warrior(cls) -> "UnitBuilder":
+        """
+        Create a UnitBuilder for a warrior unit.
+
+        Returns
+        -------
+        UnitBuilder
+            An instance of UnitBuilder initialized as a warrior.
+        """
         return cls.from_template(UnitTemplate.WARRIOR)
 
     @classmethod
     def rider(cls) -> "UnitBuilder":
+        """
+        Create a UnitBuilder for a rider unit.
+
+        Returns
+        -------
+        UnitBuilder
+            An instance of UnitBuilder initialized as a rider.
+        """
         return cls.from_template(UnitTemplate.RIDER)
 
     @classmethod
     def archer(cls) -> "UnitBuilder":
+        """
+        Create a UnitBuilder for an archer unit.
+
+        Returns
+        -------
+        UnitBuilder
+            An instance of UnitBuilder initialized as an archer.
+        """
         return cls.from_template(UnitTemplate.ARCHER)
 
     @classmethod
     def catapult(cls) -> "UnitBuilder":
+        """
+        Create a UnitBuilder for a catapult unit.
+
+        Returns
+        -------
+        UnitBuilder
+            An instance of UnitBuilder initialized as a catapult.
+        """
         return cls.from_template(UnitTemplate.CATAPULT)
 
     @classmethod
     def knight(cls) -> "UnitBuilder":
+        """
+        Create a UnitBuilder for a knight unit.
+
+        Returns
+        -------
+        UnitBuilder
+            An instance of UnitBuilder initialized as a knight.
+        """
         return cls.from_template(UnitTemplate.KNIGHT)
 
     @classmethod
     def swordsman(cls) -> "UnitBuilder":
+        """
+        Create a UnitBuilder for a swordsman unit.
+
+        Returns
+        -------
+        UnitBuilder
+            An instance of UnitBuilder initialized as a swordsman.
+        """
         return cls.from_template(UnitTemplate.SWORDSMAN)
 
     @classmethod
     def defender(cls) -> "UnitBuilder":
+        """
+        Create a UnitBuilder for a defender unit.
+
+        Returns
+        -------
+        UnitBuilder
+            An instance of UnitBuilder initialized as a defender.
+        """
         return cls.from_template(UnitTemplate.DEFENDER)
 
     @classmethod
     def cloak(cls) -> "UnitBuilder":
+        """
+        Create a UnitBuilder for a cloak unit.
+
+        Returns
+        -------
+        UnitBuilder
+            An instance of UnitBuilder initialized as a cloak.
+        """
         return cls.from_template(UnitTemplate.CLOAK)
 
     @classmethod
     def dagger(cls) -> "UnitBuilder":
+        """
+        Create a UnitBuilder for a dagger unit.
+
+        Returns
+        -------
+        UnitBuilder
+            An instance of UnitBuilder initialized as a dagger.
+        """
         return cls.from_template(UnitTemplate.DAGGER)
 
     @classmethod
     def mind_bender(cls) -> "UnitBuilder":
+        """
+        Create a UnitBuilder for a mind bender unit.
+
+        Returns
+        -------
+        UnitBuilder
+            An instance of UnitBuilder initialized as a mind bender.
+        """
         return cls.from_template(UnitTemplate.MIND_BENDER)
 
     @classmethod
     def giant(cls) -> "UnitBuilder":
+        """
+        Create a UnitBuilder for a giant unit.
+
+        Returns
+        -------
+        UnitBuilder
+            An instance of UnitBuilder initialized as a giant.
+        """
         return cls.from_template(UnitTemplate.GIANT)
 
     @classmethod
     def raft(cls, unit: UnitTemplate = UnitTemplate.DEFAULT_WARRIOR) -> "UnitBuilder":
+        """
+        Create a UnitBuilder for a raft unit.
+
+        Parameters
+        ----------
+        unit : UnitTemplate, optional
+            The unit template to derive the raft's max HP from, by default UnitTemplate.DEFAULT_WARRIOR.
+
+        Returns
+        -------
+        UnitBuilder
+            An instance of UnitBuilder initialized as a raft.
+        """
         return cls.from_template(UnitTemplate.DEFAULT_RAFT).with_max_hp(
             unit.value.max_hp
         )
 
     @classmethod
     def scout(cls, unit: UnitTemplate = UnitTemplate.DEFAULT_WARRIOR) -> "UnitBuilder":
-        return cls.from_template(UnitTemplate.DEFAULT_RAFT).with_max_hp(
+        """
+        Create a UnitBuilder for a scout unit.
+
+        Parameters
+        ----------
+        unit : UnitTemplate, optional
+            The unit template to derive the scout's max HP from, by default UnitTemplate.DEFAULT_WARRIOR.
+
+        Returns
+        -------
+        UnitBuilder
+            An instance of UnitBuilder initialized as a scout.
+        """
+        return cls.from_template(UnitTemplate.DEFAULT_SCOUT).with_max_hp(
             unit.value.max_hp
         )
 
     @classmethod
     def rammer(cls, unit: UnitTemplate = UnitTemplate.DEFAULT_WARRIOR) -> "UnitBuilder":
-        return cls.from_template(UnitTemplate.DEFAULT_RAFT).with_max_hp(
+        """
+        Create a UnitBuilder for a rammer unit.
+
+        Parameters
+        ----------
+        unit : UnitTemplate, optional
+            The unit template to derive the rammer's max HP from, by default UnitTemplate.DEFAULT_WARRIOR.
+
+        Returns
+        -------
+        UnitBuilder
+            An instance of UnitBuilder initialized as a rammer.
+        """
+        return cls.from_template(UnitTemplate.DEFAULT_RAMMER).with_max_hp(
             unit.value.max_hp
         )
 
     @classmethod
     def bomber(cls, unit: UnitTemplate = UnitTemplate.DEFAULT_WARRIOR) -> "UnitBuilder":
-        return cls.from_template(UnitTemplate.DEFAULT_RAFT).with_max_hp(
+        """
+        Create a UnitBuilder for a bomber unit.
+
+        Parameters
+        ----------
+        unit : UnitTemplate, optional
+            The unit template to derive the bomber's max HP from, by default UnitTemplate.DEFAULT_WARRIOR.
+
+        Returns
+        -------
+        UnitBuilder
+            An instance of UnitBuilder initialized as a bomber.
+        """
+        return cls.from_template(UnitTemplate.DEFAULT_BOMBER).with_max_hp(
             unit.value.max_hp
         )
 
     @classmethod
     def juggernaut(cls) -> "UnitBuilder":
+        """
+        Create a UnitBuilder for a juggernaut unit.
+
+        Returns
+        -------
+        UnitBuilder
+            An instance of UnitBuilder initialized as a juggernaut.
+        """
         return cls.from_template(UnitTemplate.JUGGERNAUT)
 
     @classmethod
     def pirate(cls) -> "UnitBuilder":
+        """
+        Create a UnitBuilder for a pirate unit.
+
+        Returns
+        -------
+        UnitBuilder
+            An instance of UnitBuilder initialized as a pirate.
+        """
         return cls.from_template(UnitTemplate.PIRATE)
 
     @classmethod
     def tridention(cls) -> "UnitBuilder":
+        """
+        Create a UnitBuilder for a tridention unit.
+
+        Returns
+        -------
+        UnitBuilder
+            An instance of UnitBuilder initialized as a tridention.
+        """
         return cls.from_template(UnitTemplate.TRIDENTION)
 
     @classmethod
     def shark(cls) -> "UnitBuilder":
+        """
+        Create a UnitBuilder for a shark unit.
+
+        Returns
+        -------
+        UnitBuilder
+            An instance of UnitBuilder initialized as a shark.
+        """
         return cls.from_template(UnitTemplate.SHARK)
 
     @classmethod
     def jelly(cls) -> "UnitBuilder":
+        """
+        Create a UnitBuilder for a jelly unit.
+
+        Returns
+        -------
+        UnitBuilder
+            An instance of UnitBuilder initialized as a jelly.
+        """
         return cls.from_template(UnitTemplate.JELLY)
 
     @classmethod
     def puffer(cls) -> "UnitBuilder":
+        """
+        Create a UnitBuilder for a puffer unit.
+
+        Returns
+        -------
+        UnitBuilder
+            An instance of UnitBuilder initialized as a puffer.
+        """
         return cls.from_template(UnitTemplate.PUFFER)
 
     @classmethod
     def crab(cls) -> "UnitBuilder":
+        """
+        Create a UnitBuilder for a crab unit.
+
+        Returns
+        -------
+        UnitBuilder
+            An instance of UnitBuilder initialized as a crab.
+        """
         return cls.from_template(UnitTemplate.CRAB)
 
     @classmethod
-    def polytar(cls) -> "UnitBuilder":
+    def polytaur(cls) -> "UnitBuilder":
+        """
+        Create a UnitBuilder for a polytaur unit.
+
+        Returns
+        -------
+        UnitBuilder
+            An instance of UnitBuilder initialized as a polytaur.
+        """
         return cls.from_template(UnitTemplate.POLYTAUR)
 
     @classmethod
     def egg(cls) -> "UnitBuilder":
+        """
+        Create a UnitBuilder for an egg unit.
+
+        Returns
+        -------
+        UnitBuilder
+            An instance of UnitBuilder initialized as an egg.
+        """
         return cls.from_template(UnitTemplate.EGG)
 
     @classmethod
     def baby_dragon(cls) -> "UnitBuilder":
+        """
+        Create a UnitBuilder for a baby dragon unit.
+
+        Returns
+        -------
+        UnitBuilder
+            An instance of UnitBuilder initialized as a baby dragon.
+        """
         return cls.from_template(UnitTemplate.BABY_DRAGON)
 
     @classmethod
     def fire_dragon(cls) -> "UnitBuilder":
+        """
+        Create a UnitBuilder for a fire dragon unit.
+
+        Returns
+        -------
+        UnitBuilder
+            An instance of UnitBuilder initialized as a fire dragon.
+        """
         return cls.from_template(UnitTemplate.FIRE_DRAGON)
 
     @classmethod
     def mooni(cls) -> "UnitBuilder":
+        """
+        Create a UnitBuilder for a mooni unit.
+
+        Returns
+        -------
+        UnitBuilder
+            An instance of UnitBuilder initialized as a mooni.
+        """
         return cls.from_template(UnitTemplate.MOONI)
 
     @classmethod
     def ice_archer(cls) -> "UnitBuilder":
+        """
+        Create a UnitBuilder for an ice archer unit.
+
+        Returns
+        -------
+        UnitBuilder
+            An instance of UnitBuilder initialized as an ice archer.
+        """
         return cls.from_template(UnitTemplate.ICE_ARCHER)
 
     @classmethod
     def battle_sled(cls) -> "UnitBuilder":
+        """
+        Create a UnitBuilder for a battle sled unit.
+
+        Returns
+        -------
+        UnitBuilder
+            An instance of UnitBuilder initialized as a battle sled.
+        """
         return cls.from_template(UnitTemplate.BATTLE_SLED)
 
     @classmethod
     def ice_fortress(cls) -> "UnitBuilder":
+        """
+        Create a UnitBuilder for an ice fortress unit.
+
+        Returns
+        -------
+        UnitBuilder
+            An instance of UnitBuilder initialized as an ice fortress.
+        """
         return cls.from_template(UnitTemplate.ICE_FORTRESS)
 
     @classmethod
     def gaami(cls) -> "UnitBuilder":
+        """
+        Create a UnitBuilder for a gaami unit.
+
+        Returns
+        -------
+        UnitBuilder
+            An instance of UnitBuilder initialized as a gaami.
+        """
         return cls.from_template(UnitTemplate.GAAMI)
 
     @classmethod
     def hexapod(cls) -> "UnitBuilder":
+        """
+        Create a UnitBuilder for a hexapod unit.
+
+        Returns
+        -------
+        UnitBuilder
+            An instance of UnitBuilder initialized as a hexapod.
+        """
         return cls.from_template(UnitTemplate.HEXAPOD)
 
     @classmethod
     def doomux(cls) -> "UnitBuilder":
+        """
+        Create a UnitBuilder for a doomux unit.
+
+        Returns
+        -------
+        UnitBuilder
+            An instance of UnitBuilder initialized as a doomux.
+        """
         return cls.from_template(UnitTemplate.DOOMUX)
 
     @classmethod
     def kiton(cls) -> "UnitBuilder":
+        """
+        Create a UnitBuilder for a kiton unit.
+
+        Returns
+        -------
+        UnitBuilder
+            An instance of UnitBuilder initialized as a kiton.
+        """
         return cls.from_template(UnitTemplate.KITON)
 
     @classmethod
     def phychi(cls) -> "UnitBuilder":
+        """
+        Create a UnitBuilder for a phychi unit.
+
+        Returns
+        -------
+        UnitBuilder
+            An instance of UnitBuilder initialized as a phychi.
+        """
         return cls.from_template(UnitTemplate.PHYCHI)
 
     @classmethod
     def shaman(cls) -> "UnitBuilder":
+        """
+        Create a UnitBuilder for a shaman unit.
+
+        Returns
+        -------
+        UnitBuilder
+            An instance of UnitBuilder initialized as a shaman.
+        """
         return cls.from_template(UnitTemplate.SHAMAN)
 
     @classmethod
     def exida(cls) -> "UnitBuilder":
+        """
+        Create a UnitBuilder for an exida unit.
+
+        Returns
+        -------
+        UnitBuilder
+            An instance of UnitBuilder initialized as an exida.
+        """
         return cls.from_template(UnitTemplate.EXIDA)
 
     @classmethod
     def centipede(cls) -> "UnitBuilder":
+        """
+        Create a UnitBuilder for a centipede unit.
+
+        Returns
+        -------
+        UnitBuilder
+            An instance of UnitBuilder initialized as a centipede.
+        """
         return cls.from_template(UnitTemplate.CENTIPEDE)
 
     @classmethod
     def segment(cls) -> "UnitBuilder":
+        """
+        Create a UnitBuilder for a segment unit.
+
+        Returns
+        -------
+        UnitBuilder
+            An instance of UnitBuilder initialized as a segment.
+        """
         return cls.from_template(UnitTemplate.SEGMENT)
 
     # endregion sugar
 
     # Mutator methods
     def with_max_hp(self, hp: int) -> "UnitBuilder":
+        """
+        Set the maximum hit points for the unit.
+
+        Parameters
+        ----------
+        hp : int
+            The maximum hit points to set.
+
+        Returns
+        -------
+        UnitBuilder
+            The current instance of UnitBuilder.
+
+        Notes
+        -----
+        This does not set the current HP. Use `with_current_hp` to set that separately.
+        """
         self._unit.max_hp = hp
         return self
 
-    def with_current_hp(self, hp: F) -> "UnitBuilder":
-        self._unit.current_hp = hp
-        self._hp_set = True
+    def with_current_hp(self, hp: float) -> "UnitBuilder":
+        """
+        Set the current hit points for the unit.
+
+        Parameters
+        ----------
+        hp : float
+            The current hit points to set.
+
+        Returns
+        -------
+        UnitBuilder
+            The current instance of UnitBuilder.
+        """
+        if hp > self._unit.max_hp:
+            raise ValueError("Current HP cannot exceed max HP. Set max HP first.")
+
+        self._unit.current_hp = F(hp)
+        self._current_hp_set = True
         return self
 
-    def with_attack(self, attack: F) -> "UnitBuilder":
-        self._unit.attack = attack
+    def with_attack(self, attack: float) -> "UnitBuilder":
+        """
+        Set the attack value for the unit.
+
+        Parameters
+        ----------
+        attack : float
+            The attack value to set.
+
+        Returns
+        -------
+        UnitBuilder
+            The current instance of UnitBuilder.
+        """
+        self._unit.attack = F(attack)
         return self
 
-    def with_defense(self, defense: F) -> "UnitBuilder":
-        self._unit.defense = defense
+    def with_defense(self, defense: float) -> "UnitBuilder":
+        """
+        Set the defense value for the unit.
+
+        Parameters
+        ----------
+        defense : float
+            The defense value to set.
+
+        Returns
+        -------
+        UnitBuilder
+            The current instance of UnitBuilder.
+        """
+        self._unit.defense = F(defense)
         return self
 
     def add_trait(self, trait: T) -> "UnitBuilder":
+        """
+        Add a single trait to the unit.
+
+        Parameters
+        ----------
+        trait : Trait
+            The trait to add.
+
+        Returns
+        -------
+        UnitBuilder
+            The current instance of UnitBuilder.
+        """
         if trait not in self._unit.traits:
             self._unit.traits.append(trait)
         return self
 
     def add_traits(self, traits: Iterable[T]) -> "UnitBuilder":
+        """
+        Add multiple traits to the unit.
+
+        Parameters
+        ----------
+        traits : Iterable[Trait]
+            An iterable of traits to add.
+
+        Returns
+        -------
+        UnitBuilder
+            The current instance of UnitBuilder.
+        """
         for trait in traits:
             self.add_trait(trait)
         return self
 
     def veteran(self) -> "UnitBuilder":
+        """
+        Apply veteran status to the unit, increasing max HP by 5.
+
+        Returns
+        -------
+        UnitBuilder
+            The current instance of UnitBuilder.
+
+        Notes
+        -----
+        If you haven't set the current HP, it will be set to the new max HP.
+        If you have set the current HP, it will remain unchanged.
+        """
         self._unit.max_hp += 5
-        if not self._hp_set:
+        if not self._current_hp_set:
             self._unit.current_hp = F(self._unit.max_hp)
         return self
 
     def boosted(self) -> "UnitBuilder":
+        """
+        Apply boosted status to the unit, increasing movement and attack.
+
+        Returns
+        -------
+        UnitBuilder
+            The current instance of UnitBuilder.
+        """
         self._unit.movement += 1
         self._unit.attack += F(1, 2)
         return self
 
     def poisoned(self) -> "UnitBuilder":
+        """
+        Apply poisoned status to the unit, reducing defense.
+
+        Returns
+        -------
+        UnitBuilder
+            The current instance of UnitBuilder.
+
+        Notes
+        -----
+        As in the game, this overrides any previous or subsequent defense bonuses.
+        """
         self._defense_bonus = F(4, 5)
         self._poisoned = True
         return self
 
     def defense_bonus(self) -> "UnitBuilder":
+        """
+        Apply a defense bonus to the unit if not poisoned.
+
+        Returns
+        -------
+        UnitBuilder
+            The current instance of UnitBuilder.
+        """
         if not self._poisoned:
             self._defense_bonus = F(3, 2)
         return self
 
     def wall_bonus(self) -> "UnitBuilder":
+        """
+        Apply a wall defense bonus to the unit if not poisoned.
+
+        Returns
+        -------
+        UnitBuilder
+            The current instance of UnitBuilder.
+        """
         if not self._poisoned:
             self._defense_bonus = F(4)
         return self
 
     def build(self) -> Unit:
+        """
+        Finalize the unit configuration and return the built unit.
+
+        Returns
+        -------
+        Unit
+            The fully constructed unit with the specified attributes and traits.
+        """
         self._unit.defense *= self._defense_bonus
         return self._unit

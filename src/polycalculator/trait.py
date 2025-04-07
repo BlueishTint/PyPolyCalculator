@@ -1,3 +1,5 @@
+"""Contains the Trait class."""
+
 from enum import Enum, auto
 
 
@@ -6,11 +8,14 @@ class Trait(Enum):
 
     # Normal
     CARRY = auto()
-    """Allows a unit to carry another unit inside. A unit with the carry skill can move to a land tile adjacent to water. Doing so releases the unit it was carrying and ends the unit's turn."""
+    """
+    Allows a unit to carry another unit inside.
+    A unit with the carry skill can move to a land tile adjacent to water.
+    Doing so releases the unit it was carrying and ends the unit's turn.
+    
+    """
     CONVERT = auto()
-    """Allows a unit to convert an enemy unit into a friendly unit by attacking it.
-
-    Converted units take up population in the attacker's city but do not change score for either players."""
+    """Allows a unit to convert an enemy unit into a friendly unit by attacking it."""
     DASH = auto()
     """Allows a unit to attack after moving in the same turn."""
     ESCAPE = auto()

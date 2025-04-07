@@ -13,3 +13,6 @@ polycalculator = "polycalculator:main"
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[dependency-groups]
+docs = ["esbonio>=0.16.5", "sphinx>=8.2.3", "sphinx-rtd-theme>=3.0.2"]

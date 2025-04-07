@@ -1,0 +1,6 @@
+﻿polycalculator
+==============
+
+.. automodule:: polycalculator
+
+   
