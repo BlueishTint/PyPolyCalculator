@@ -11,7 +11,7 @@ Good question. There are two answers:
 ## Roadmap
 
 - [x] Unit representation
-- [ ] Single combat
+- [x] Single combat
 - [ ] Multiple combat
 - [ ] A* graph to find optimal order
 - [ ] Discord bot
