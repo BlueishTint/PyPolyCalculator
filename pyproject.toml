@@ -16,4 +16,21 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [dependency-groups]
+dev = [
+    "nox>=2025.2.9",
+    "pytest>=8.3.5",
+    "pytest-cov>=6.1.1",
+    "ruff>=0.11.4",
+]
 docs = ["esbonio>=0.16.5", "sphinx>=8.2.3", "sphinx-rtd-theme>=3.0.2"]
+
+[tool.pytest.ini_options]
+addopts = "--cov polycalculator"
+testpaths = ["tests"]
+
+[tool.ruff.lint]
+extend-select = ["E", "W", "PT", "Q"]
+ignore = ["W505"]
+
+[tool.ruff.lint.pycodestyle]
+max-doc-length = 88

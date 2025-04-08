@@ -4,9 +4,11 @@ from collections.abc import Iterable
 from copy import deepcopy
 from enum import Enum
 from fractions import Fraction as F
+
+from attrs import define, field
+
 from polycalculator.status_effect import StatusEffect
 from polycalculator.trait import Trait as T
-from attrs import define, field
 
 
 @define(slots=True, kw_only=True)
@@ -14,7 +16,8 @@ class Unit:
     """
     A Polytopia unit.
 
-    When initializing a `Unit`, `current_hp` is automatically set to `max_hp` unless otherwise specified.
+    When initializing a `Unit`,
+    `current_hp` is automatically set to `max_hp` unless otherwise specified.
 
     Attributes
     ----------
@@ -603,7 +606,8 @@ class UnitBuilder:
         Parameters
         ----------
         unit : UnitTemplate, optional
-            The unit template to derive the raft's max HP from, by default UnitTemplate.DEFAULT_WARRIOR.
+            The unit template to derive the raft's max HP from,
+            by default UnitTemplate.DEFAULT_WARRIOR.
 
         Returns
         -------
@@ -622,7 +626,8 @@ class UnitBuilder:
         Parameters
         ----------
         unit : UnitTemplate, optional
-            The unit template to derive the scout's max HP from, by default UnitTemplate.DEFAULT_WARRIOR.
+            The unit template to derive the scout's max HP from,
+            by default UnitTemplate.DEFAULT_WARRIOR.
 
         Returns
         -------
@@ -641,7 +646,8 @@ class UnitBuilder:
         Parameters
         ----------
         unit : UnitTemplate, optional
-            The unit template to derive the rammer's max HP from, by default UnitTemplate.DEFAULT_WARRIOR.
+            The unit template to derive the rammer's max HP from,
+            by default UnitTemplate.DEFAULT_WARRIOR.
 
         Returns
         -------
@@ -660,7 +666,8 @@ class UnitBuilder:
         Parameters
         ----------
         unit : UnitTemplate, optional
-            The unit template to derive the bomber's max HP from, by default UnitTemplate.DEFAULT_WARRIOR.
+            The unit template to derive the bomber's max HP from,
+            by default UnitTemplate.DEFAULT_WARRIOR.
 
         Returns
         -------
@@ -999,7 +1006,7 @@ class UnitBuilder:
 
         Notes
         -----
-        If the current HP exceeds the maximum HP by more than 5, it will be capped at max HP + 5.
+        If current_hp exceeds max_hp by more than 5, it will be capped at max_hp + 5.
         Then, if the unit is not already a veteran, it will be marked as such.
         """
         if (

@@ -1,9 +1,9 @@
 from fractions import Fraction
+from typing import NamedTuple
+
 from polycalculator.status_effect import StatusEffect
 from polycalculator.trait import Trait
 from polycalculator.unit import Unit, UnitBuilder
-
-from typing import NamedTuple
 
 
 class CombatResult(NamedTuple):
@@ -33,8 +33,9 @@ def _round_away_from_zero(x: Fraction) -> Fraction:
     """
     Round a Fraction away from zero.
 
-    This is needed because Python's built-in round function rounds to the nearest even number
-    when the number is exactly halfway between two integers. This function rounds away from zero.
+    This is needed because Python's built-in round function rounds to the nearest
+    even number when the number is exactly halfway between two integers.
+    This function rounds away from zero.
 
     Parameters
     ----------
