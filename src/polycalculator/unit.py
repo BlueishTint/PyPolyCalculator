@@ -4,11 +4,12 @@ from collections.abc import Iterable
 from copy import deepcopy
 from enum import Enum
 from fractions import Fraction as F
+from polycalculator.status_effect import StatusEffect
 from polycalculator.trait import Trait as T
 from attrs import define, field
 
 
-@define(slots=True)
+@define(slots=True, kw_only=True)
 class Unit:
     """
     A Polytopia unit.
@@ -25,15 +26,29 @@ class Unit:
         The attack stat of the unit.
     defense : Fraction
         The defense stat of the unit.
-    movement : int
+    movement : int, default 1
         The movement stat of the unit.
-    range : int
+    range : int, default 1
         The range stat of the unit.
-    traits : list[Trait]
+    traits : list[Trait], optional
         A list of traits the unit has.
-    current_hp : Fraction
+    current_hp : Fraction, default `max_hp`
         The current hit points of the unit.
-        Defaults to `max_hp`.
+    status_effects : set[StatusEffect], default `set()`
+
+    Examples
+    --------
+    >>> unit = Unit(cost=2, max_hp=10, attack=F(2), defense=F(2))
+    >>> unit.current_hp
+    10
+    >>> unit.movement
+    1
+    >>> unit.range
+    1
+    >>> unit.traits
+    []
+    >>> unit.status_effects
+    set()
 
     """
 
@@ -41,14 +56,33 @@ class Unit:
     max_hp: int
     attack: F
     defense: F
-    movement: int
-    range: int
-    traits: list[T]
+    movement: int = 1
+    range: int = 1
+    traits: list[T] = field(factory=list)
+    status_effects: set[StatusEffect] = field(factory=set)
     current_hp: F = field()
 
     @current_hp.default  # type: ignore[attr-defined]
     def _default_current_hp(self):
         return F(self.max_hp)
+
+    @property
+    def defense_bonus(self) -> F:
+        """
+        Calculate the defense bonus based on the unit's status effects.
+
+        Returns
+        -------
+        Fraction
+            The defense bonus as a fraction.
+        """
+        if StatusEffect.POISONED in self.status_effects:
+            return F(7, 10)
+        if StatusEffect.FORTIFIED in self.status_effects:
+            return F(3, 2)
+        if StatusEffect.WALLED in self.status_effects:
+            return F(4, 1)
+        return F(1, 1)
 
 
 class UnitTemplate(Enum):
@@ -59,8 +93,6 @@ class UnitTemplate(Enum):
         max_hp=10,
         attack=F(2),
         defense=F(2),
-        movement=1,
-        range=1,
         traits=[T.DASH, T.FORTIFY],
     )  # type: ignore
 
@@ -70,8 +102,6 @@ class UnitTemplate(Enum):
         max_hp=10,
         attack=F(2),
         defense=F(2),
-        movement=1,
-        range=1,
         traits=[T.DASH, T.FORTIFY],
     )  # type: ignore
     ARCHER = Unit(
@@ -79,7 +109,6 @@ class UnitTemplate(Enum):
         max_hp=10,
         attack=F(2),
         defense=F(1),
-        movement=1,
         range=2,
         traits=[T.DASH, T.FORTIFY],
     )  # type: ignore
@@ -89,7 +118,6 @@ class UnitTemplate(Enum):
         attack=F(2),
         defense=F(1),
         movement=2,
-        range=1,
         traits=[T.DASH, T.ESCAPE, T.FORTIFY],
     )  # type: ignore
     CATAPULT = Unit(
@@ -97,7 +125,6 @@ class UnitTemplate(Enum):
         max_hp=10,
         attack=F(4),
         defense=F(0),
-        movement=1,
         range=3,
         traits=[T.STIFF],
     )  # type: ignore
@@ -107,7 +134,6 @@ class UnitTemplate(Enum):
         attack=F(7, 2),
         defense=F(1),
         movement=3,
-        range=1,
         traits=[T.DASH, T.PERSIST, T.FORTIFY],
     )  # type: ignore
     SWORDSMAN = Unit(
@@ -115,8 +141,6 @@ class UnitTemplate(Enum):
         max_hp=15,
         attack=F(3),
         defense=F(3),
-        movement=1,
-        range=1,
         traits=[T.DASH],
     )  # type: ignore
     DEFENDER = Unit(
@@ -124,8 +148,6 @@ class UnitTemplate(Enum):
         max_hp=15,
         attack=F(1),
         defense=F(3),
-        movement=1,
-        range=1,
         traits=[T.FORTIFY],
     )  # type: ignore
     CLOAK = Unit(
@@ -134,7 +156,6 @@ class UnitTemplate(Enum):
         attack=F(2),
         defense=F(1, 2),
         movement=2,
-        range=1,
         traits=[T.HIDE, T.INFILTRATE, T.DASH, T.SCOUT, T.CREEP, T.STATIC, T.STIFF],  # type: ignore
     )
     DAGGER = Unit(
@@ -142,8 +163,6 @@ class UnitTemplate(Enum):
         max_hp=10,
         attack=F(2),
         defense=F(1),
-        movement=1,
-        range=1,
         traits=[T.SURPRISE, T.DASH, T.INDEPENDENT, T.STATIC],  # type: ignore
     )
     MIND_BENDER = Unit(
@@ -151,8 +170,6 @@ class UnitTemplate(Enum):
         max_hp=10,
         attack=F(0),
         defense=F(1),
-        movement=1,
-        range=1,
         traits=[T.HEAL, T.CONVERT, T.STIFF],
     )  # type: ignore
     GIANT = Unit(
@@ -160,8 +177,6 @@ class UnitTemplate(Enum):
         max_hp=40,
         attack=F(5),
         defense=F(4),
-        movement=1,
-        range=1,
         traits=[T.STATIC],
     )  # type: ignore
     # Naval
@@ -189,7 +204,6 @@ class UnitTemplate(Enum):
         attack=F(3),
         defense=F(3),
         movement=3,
-        range=1,
         traits=[T.DASH, T.CARRY, T.STATIC],
     )  # type: ignore
     DEFAULT_BOMBER = Unit(
@@ -207,7 +221,6 @@ class UnitTemplate(Enum):
         attack=F(4),
         defense=F(4),
         movement=2,
-        range=1,
         traits=[T.CARRY, T.STATIC, T.STIFF, T.STOMP],
     )  # type: ignore
     PIRATE = Unit(
@@ -216,7 +229,6 @@ class UnitTemplate(Enum):
         attack=F(2),
         defense=F(1),
         movement=2,
-        range=1,
         traits=[T.SURPRISE, T.DASH, T.INDEPENDENT, T.STATIC],  # type: ignore
     )
     # Aquarion
@@ -235,7 +247,6 @@ class UnitTemplate(Enum):
         attack=F(7, 2),
         defense=F(2),
         movement=3,
-        range=1,
         traits=[T.DASH, T.SURPRISE],
     )  # type: ignore
     JELLY = Unit(
@@ -244,7 +255,6 @@ class UnitTemplate(Enum):
         attack=F(2),
         defense=F(2),
         movement=2,
-        range=1,
         traits=[T.TENTACLES, T.STIFF, T.STATIC],
     )  # type: ignore
     PUFFER = Unit(
@@ -262,7 +272,6 @@ class UnitTemplate(Enum):
         attack=F(4),
         defense=F(4),
         movement=2,
-        range=1,
         traits=[T.ESCAPE, T.AUTOFLOOD, T.STATIC],
     )  # type: ignore
     # Elyrion
@@ -271,8 +280,6 @@ class UnitTemplate(Enum):
         max_hp=15,
         attack=F(3),
         defense=F(1),
-        movement=1,
-        range=1,
         traits=[T.DASH, T.INDEPENDENT, T.FORTIFY, T.STATIC],  # type: ignore
     )
     EGG = Unit(
@@ -280,8 +287,6 @@ class UnitTemplate(Enum):
         max_hp=10,
         attack=F(0),
         defense=F(2),
-        movement=1,
-        range=1,
         traits=[T.GROW, T.FORTIFY, T.STIFF, T.STATIC],
     )  # type: ignore
     BABY_DRAGON = Unit(
@@ -290,7 +295,6 @@ class UnitTemplate(Enum):
         attack=F(3),
         defense=F(3),
         movement=2,
-        range=1,
         traits=[T.GROW, T.DASH, T.ESCAPE, T.SCOUT, T.STATIC],  # type: ignore
     )
     FIRE_DRAGON = Unit(
@@ -308,8 +312,6 @@ class UnitTemplate(Enum):
         max_hp=10,
         attack=F(0),
         defense=F(1),
-        movement=1,
-        range=1,
         traits=[T.AUTO_FREEZE, T.SKATE, T.STIFF, T.STATIC],
     )  # type: ignore
     ICE_ARCHER = Unit(
@@ -317,7 +319,6 @@ class UnitTemplate(Enum):
         max_hp=10,
         attack=F(0),
         defense=F(1),
-        movement=1,
         range=2,
         traits=[T.DASH, T.FREEZE, T.FORTIFY, T.STIFF],
     )  # type: ignore
@@ -327,7 +328,6 @@ class UnitTemplate(Enum):
         attack=F(3),
         defense=F(2),
         movement=2,
-        range=1,
         traits=[T.DASH, T.ESCAPE, T.SKATE],
     )  # type: ignore
     ICE_FORTRESS = Unit(
@@ -335,7 +335,6 @@ class UnitTemplate(Enum):
         max_hp=20,
         attack=F(4),
         defense=F(3),
-        movement=1,
         range=2,
         traits=[T.SKATE, T.SCOUT],
     )  # type: ignore
@@ -344,8 +343,6 @@ class UnitTemplate(Enum):
         max_hp=30,
         attack=F(4),
         defense=F(3),
-        movement=1,
-        range=1,
         traits=[T.AUTO_FREEZE, T.FREEZE_AREA, T.STATIC],
     )  # type: ignore
     # Cymanti
@@ -355,7 +352,6 @@ class UnitTemplate(Enum):
         attack=F(3),
         defense=F(1),
         movement=2,
-        range=1,
         traits=[T.DASH, T.ESCAPE, T.SNEAK, T.CREEP],
     )  # type: ignore
     DOOMUX = Unit(
@@ -364,7 +360,6 @@ class UnitTemplate(Enum):
         attack=F(4),
         defense=F(2),
         movement=3,
-        range=1,
         traits=[T.DASH, T.CREEP, T.EXPLODE],
     )  # type: ignore
     KITON = Unit(
@@ -372,8 +367,6 @@ class UnitTemplate(Enum):
         max_hp=15,
         attack=F(1),
         defense=F(3),
-        movement=1,
-        range=1,
         traits=[T.POISON],
     )  # type: ignore
     PHYCHI = Unit(
@@ -390,8 +383,6 @@ class UnitTemplate(Enum):
         max_hp=10,
         attack=F(1),
         defense=F(1),
-        movement=1,
-        range=1,
         traits=[T.CONVERT, T.BOOST, T.STATIC],
     )  # type: ignore
     EXIDA = Unit(
@@ -399,7 +390,6 @@ class UnitTemplate(Enum):
         max_hp=10,
         attack=F(3),
         defense=F(1),
-        movement=1,
         range=3,
         traits=[T.POISON, T.SPLASH],
     )  # type: ignore
@@ -409,7 +399,6 @@ class UnitTemplate(Enum):
         attack=F(4),
         defense=F(3),
         movement=2,
-        range=1,
         traits=[T.DASH, T.EAT, T.CREEP, T.STATIC],
     )  # type: ignore
     SEGMENT = Unit(
@@ -418,7 +407,6 @@ class UnitTemplate(Enum):
         attack=F(4),
         defense=F(3),
         movement=2,
-        range=1,
         traits=[T.DASH, T.EAT, T.CREEP, T.STATIC],
     )  # type: ignore
 
@@ -436,10 +424,13 @@ class UnitBuilder:
         A deep copy of the base unit to be customized.
     _current_hp_set : bool
         Flag indicating if the current HP has been explicitly set.
-    _defense_bonus : Fraction
-        Modifier applied to the unit's defense.
-    _poisoned : bool
-        Flag indicating if the unit is poisoned.
+
+    Examples
+    --------
+    >>> unit = UnitBuilder.warrior().with_max_hp(15).with_attack(3).build()
+    >>> unit.status_effects
+    {<StatusEffect.VETERAN: 5>}
+
     """
 
     def __init__(self, base: Unit):
@@ -453,8 +444,6 @@ class UnitBuilder:
         """
         self._unit = deepcopy(base)
         self._current_hp_set = False
-        self._defense_bonus = F(1)
-        self._poisoned = False
 
     # region sugar
     @classmethod
@@ -994,7 +983,7 @@ class UnitBuilder:
         self._unit.max_hp = hp
         return self
 
-    def with_current_hp(self, hp: float) -> "UnitBuilder":
+    def with_current_hp(self, hp: F) -> "UnitBuilder":
         """
         Set the current hit points for the unit.
 
@@ -1007,11 +996,21 @@ class UnitBuilder:
         -------
         UnitBuilder
             The current instance of UnitBuilder.
-        """
-        if hp > self._unit.max_hp:
-            raise ValueError("Current HP cannot exceed max HP. Set max HP first.")
 
-        self._unit.current_hp = F(hp)
+        Notes
+        -----
+        If the current HP exceeds the maximum HP by more than 5, it will be capped at max HP + 5.
+        Then, if the unit is not already a veteran, it will be marked as such.
+        """
+        if (
+            hp >= self._unit.max_hp + 5
+            and StatusEffect.VETERAN not in self._unit.status_effects
+        ):
+            hp = F(self._unit.max_hp + 5)
+            self._unit.status_effects.add(StatusEffect.VETERAN)
+            return self.with_max_hp(int(hp))
+
+        self._unit.current_hp = hp
         self._current_hp_set = True
         return self
 
@@ -1099,6 +1098,9 @@ class UnitBuilder:
         If you haven't set the current HP, it will be set to the new max HP.
         If you have set the current HP, it will remain unchanged.
         """
+        if StatusEffect.VETERAN in self._unit.status_effects:
+            return self
+        self._unit.status_effects.add(StatusEffect.VETERAN)
         self._unit.max_hp += 5
         if not self._current_hp_set:
             self._unit.current_hp = F(self._unit.max_hp)
@@ -1113,6 +1115,7 @@ class UnitBuilder:
         UnitBuilder
             The current instance of UnitBuilder.
         """
+        self._unit.status_effects.add(StatusEffect.BOOSTED)
         self._unit.movement += 1
         self._unit.attack += F(1, 2)
         return self
@@ -1130,8 +1133,10 @@ class UnitBuilder:
         -----
         As in the game, this overrides any previous or subsequent defense bonuses.
         """
-        self._defense_bonus = F(4, 5)
-        self._poisoned = True
+        self._unit.status_effects.add(StatusEffect.POISONED)
+        self._unit.status_effects.discard(StatusEffect.FORTIFIED)
+        self._unit.status_effects.discard(StatusEffect.WALLED)
+        self._defense_bonus = F(7, 10)
         return self
 
     def defense_bonus(self) -> "UnitBuilder":
@@ -1143,8 +1148,8 @@ class UnitBuilder:
         UnitBuilder
             The current instance of UnitBuilder.
         """
-        if not self._poisoned:
-            self._defense_bonus = F(3, 2)
+        if StatusEffect.POISONED not in self._unit.status_effects:
+            self._unit.status_effects.discard(StatusEffect.FORTIFIED)
         return self
 
     def wall_bonus(self) -> "UnitBuilder":
@@ -1156,8 +1161,21 @@ class UnitBuilder:
         UnitBuilder
             The current instance of UnitBuilder.
         """
-        if not self._poisoned:
-            self._defense_bonus = F(4)
+        if StatusEffect.POISONED not in self._unit.status_effects:
+            self._unit.status_effects.discard(StatusEffect.FORTIFIED)
+            self._unit.status_effects.add(StatusEffect.WALLED)
+        return self
+
+    def takes_retaliation(self) -> "UnitBuilder":
+        """
+        Force unit to take retaliation.
+
+        Returns
+        -------
+        UnitBuilder
+            The current instance of UnitBuilder.
+        """
+        self._unit.status_effects.add(StatusEffect.TAKES_RETALIATION)
         return self
 
     def build(self) -> Unit:
@@ -1169,5 +1187,4 @@ class UnitBuilder:
         Unit
             The fully constructed unit with the specified attributes and traits.
         """
-        self._unit.defense *= self._defense_bonus
         return self._unit

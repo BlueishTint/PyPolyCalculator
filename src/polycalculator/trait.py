@@ -1,5 +1,3 @@
-"""Contains the Trait class."""
-
 from enum import Enum, auto
 
 
