@@ -50,7 +50,7 @@ def _round_away_from_zero(x: Fraction) -> Fraction:
     if x >= 0:
         return Fraction(int(x + Fraction(1, 2)), 1)
     else:
-        return Fraction(int(x - Fraction(1, 2)), 1)
+        return Fraction(int(x - Fraction(1, 2)), 1)  # pragma: no cover
 
 
 def single_combat(attacker: Unit, defender: Unit) -> CombatResult:
@@ -71,15 +71,31 @@ def single_combat(attacker: Unit, defender: Unit) -> CombatResult:
     """
     tentacle_damage = Fraction(0)
     # FUTURE: If another tentacles unit is added, this probably isn't going to work.
-    if Trait.TENTACLES in defender.traits and Trait.TENTACLES not in attacker.traits:
-        _, tentacle_damage, _, _ = single_combat(
-            UnitBuilder(defender).with_attack(2).build(), attacker
-        )
+    if (
+        Trait.TENTACLES in defender.traits
+        and Trait.TENTACLES not in attacker.traits
+        and attacker.range <= defender.range
+    ):
+        _, tentacle_damage, _, _ = single_combat(defender, attacker)
         attacker = (
             UnitBuilder(attacker)
             .with_current_hp(attacker.current_hp - tentacle_damage)
             .build()
         )
+
+    if Trait.TENTACLES in attacker.traits and Trait.TENTACLES in defender.traits:
+        attacker = (
+            UnitBuilder(attacker)
+            .add_status_effect(StatusEffect.TAKES_RETALIATION)
+            .build()
+        )
+        defender = (
+            UnitBuilder(defender)
+            .remove_trait(Trait.TENTACLES)
+            .remove_trait(Trait.STIFF)
+            .build()
+        )
+        return single_combat(attacker, defender)
 
     attack_force = attacker.attack * (attacker.current_hp / attacker.max_hp)
     defense_force = (
@@ -100,6 +116,7 @@ def single_combat(attacker: Unit, defender: Unit) -> CombatResult:
 
     takes_retaliation = StatusEffect.TAKES_RETALIATION in attacker.status_effects or (
         attacker.range <= defender.range
+        and defender.current_hp - attack_result > 0
         and Trait.STIFF not in defender.traits
         and Trait.SURPRISE not in attacker.traits
         and Trait.CONVERT not in attacker.traits
@@ -121,8 +138,8 @@ def single_combat(attacker: Unit, defender: Unit) -> CombatResult:
 
     return CombatResult(
         damage_to_attacker=tentacle_damage
-        + (Fraction(attack_result) if takes_retaliation else Fraction(0)),
-        damage_to_defender=Fraction(defense_result),
+        + (Fraction(defense_result) if takes_retaliation else Fraction(0)),
+        damage_to_defender=Fraction(attack_result),
         attacker_status_effects=attacker_status_effects,
         defender_status_effects=defender_status_effects,
     )

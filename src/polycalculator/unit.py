@@ -61,7 +61,7 @@ class Unit:
     defense: F
     movement: int = 1
     range: int = 1
-    traits: list[T] = field(factory=list)
+    traits: set[T] = field(factory=set)
     status_effects: set[StatusEffect] = field(factory=set)
     current_hp: F = field()
 
@@ -96,7 +96,7 @@ class UnitTemplate(Enum):
         max_hp=10,
         attack=F(2),
         defense=F(2),
-        traits=[T.DASH, T.FORTIFY],
+        traits={T.DASH, T.FORTIFY},
     )  # type: ignore
 
     # Normal
@@ -105,7 +105,7 @@ class UnitTemplate(Enum):
         max_hp=10,
         attack=F(2),
         defense=F(2),
-        traits=[T.DASH, T.FORTIFY],
+        traits={T.DASH, T.FORTIFY},
     )  # type: ignore
     ARCHER = Unit(
         cost=3,
@@ -113,7 +113,7 @@ class UnitTemplate(Enum):
         attack=F(2),
         defense=F(1),
         range=2,
-        traits=[T.DASH, T.FORTIFY],
+        traits={T.DASH, T.FORTIFY},
     )  # type: ignore
     RIDER = Unit(
         cost=3,
@@ -121,7 +121,7 @@ class UnitTemplate(Enum):
         attack=F(2),
         defense=F(1),
         movement=2,
-        traits=[T.DASH, T.ESCAPE, T.FORTIFY],
+        traits={T.DASH, T.ESCAPE, T.FORTIFY},
     )  # type: ignore
     CATAPULT = Unit(
         cost=8,
@@ -129,7 +129,7 @@ class UnitTemplate(Enum):
         attack=F(4),
         defense=F(0),
         range=3,
-        traits=[T.STIFF],
+        traits={T.STIFF},
     )  # type: ignore
     KNIGHT = Unit(
         cost=8,
@@ -137,21 +137,21 @@ class UnitTemplate(Enum):
         attack=F(7, 2),
         defense=F(1),
         movement=3,
-        traits=[T.DASH, T.PERSIST, T.FORTIFY],
+        traits={T.DASH, T.PERSIST, T.FORTIFY},
     )  # type: ignore
     SWORDSMAN = Unit(
         cost=5,
         max_hp=15,
         attack=F(3),
         defense=F(3),
-        traits=[T.DASH],
+        traits={T.DASH},
     )  # type: ignore
     DEFENDER = Unit(
         cost=3,
         max_hp=15,
         attack=F(1),
         defense=F(3),
-        traits=[T.FORTIFY],
+        traits={T.FORTIFY},
     )  # type: ignore
     CLOAK = Unit(
         cost=8,
@@ -159,28 +159,28 @@ class UnitTemplate(Enum):
         attack=F(2),
         defense=F(1, 2),
         movement=2,
-        traits=[T.HIDE, T.INFILTRATE, T.DASH, T.SCOUT, T.CREEP, T.STATIC, T.STIFF],  # type: ignore
+        traits={T.HIDE, T.INFILTRATE, T.DASH, T.SCOUT, T.CREEP, T.STATIC, T.STIFF},  # type: ignore
     )
     DAGGER = Unit(
         cost=2,
         max_hp=10,
         attack=F(2),
         defense=F(1),
-        traits=[T.SURPRISE, T.DASH, T.INDEPENDENT, T.STATIC],  # type: ignore
+        traits={T.SURPRISE, T.DASH, T.INDEPENDENT, T.STATIC},  # type: ignore
     )
     MIND_BENDER = Unit(
         cost=5,
         max_hp=10,
         attack=F(0),
         defense=F(1),
-        traits=[T.HEAL, T.CONVERT, T.STIFF],
+        traits={T.HEAL, T.CONVERT, T.STIFF},
     )  # type: ignore
     GIANT = Unit(
         cost=10,
         max_hp=40,
         attack=F(5),
         defense=F(4),
-        traits=[T.STATIC],
+        traits={T.STATIC},
     )  # type: ignore
     # Naval
     DEFAULT_RAFT = Unit(
@@ -190,7 +190,7 @@ class UnitTemplate(Enum):
         defense=F(2),
         movement=2,
         range=0,
-        traits=[T.CARRY, T.STATIC, T.STIFF],
+        traits={T.CARRY, T.STATIC, T.STIFF},
     )  # type: ignore
     DEFAULT_SCOUT = Unit(
         cost=7,
@@ -199,7 +199,7 @@ class UnitTemplate(Enum):
         defense=F(1),
         movement=3,
         range=2,
-        traits=[T.DASH, T.CARRY, T.SCOUT, T.STATIC],
+        traits={T.DASH, T.CARRY, T.SCOUT, T.STATIC},
     )  # type: ignore
     DEFAULT_RAMMER = Unit(
         cost=7,
@@ -207,7 +207,7 @@ class UnitTemplate(Enum):
         attack=F(3),
         defense=F(3),
         movement=3,
-        traits=[T.DASH, T.CARRY, T.STATIC],
+        traits={T.DASH, T.CARRY, T.STATIC},
     )  # type: ignore
     DEFAULT_BOMBER = Unit(
         cost=17,
@@ -216,7 +216,7 @@ class UnitTemplate(Enum):
         defense=F(2),
         movement=2,
         range=3,
-        traits=[T.CARRY, T.SPLASH, T.STATIC, T.STIFF],  # type: ignore
+        traits={T.CARRY, T.SPLASH, T.STATIC, T.STIFF},  # type: ignore
     )
     JUGGERNAUT = Unit(
         cost=10,
@@ -224,7 +224,7 @@ class UnitTemplate(Enum):
         attack=F(4),
         defense=F(4),
         movement=2,
-        traits=[T.CARRY, T.STATIC, T.STIFF, T.STOMP],
+        traits={T.CARRY, T.STATIC, T.STIFF, T.STOMP},
     )  # type: ignore
     PIRATE = Unit(
         cost=2,
@@ -232,7 +232,7 @@ class UnitTemplate(Enum):
         attack=F(2),
         defense=F(1),
         movement=2,
-        traits=[T.SURPRISE, T.DASH, T.INDEPENDENT, T.STATIC],  # type: ignore
+        traits={T.SURPRISE, T.DASH, T.INDEPENDENT, T.STATIC},  # type: ignore
     )
     # Aquarion
     TRIDENTION = Unit(
@@ -242,7 +242,7 @@ class UnitTemplate(Enum):
         defense=F(1),
         movement=2,
         range=2,
-        traits=[T.DASH, T.PERSIST],
+        traits={T.DASH, T.PERSIST},
     )  # type: ignore
     SHARK = Unit(
         cost=8,
@@ -250,7 +250,7 @@ class UnitTemplate(Enum):
         attack=F(7, 2),
         defense=F(2),
         movement=3,
-        traits=[T.DASH, T.SURPRISE],
+        traits={T.DASH, T.SURPRISE},
     )  # type: ignore
     JELLY = Unit(
         cost=8,
@@ -258,7 +258,7 @@ class UnitTemplate(Enum):
         attack=F(2),
         defense=F(2),
         movement=2,
-        traits=[T.TENTACLES, T.STIFF, T.STATIC],
+        traits={T.TENTACLES, T.STIFF, T.STATIC},
     )  # type: ignore
     PUFFER = Unit(
         cost=8,
@@ -267,7 +267,7 @@ class UnitTemplate(Enum):
         defense=F(0),
         movement=2,
         range=3,
-        traits=[T.DRENCH],
+        traits={T.DRENCH},
     )  # type: ignore
     CRAB = Unit(
         cost=10,
@@ -275,7 +275,7 @@ class UnitTemplate(Enum):
         attack=F(4),
         defense=F(4),
         movement=2,
-        traits=[T.ESCAPE, T.AUTOFLOOD, T.STATIC],
+        traits={T.ESCAPE, T.AUTOFLOOD, T.STATIC},
     )  # type: ignore
     # Elyrion
     POLYTAUR = Unit(
@@ -283,14 +283,14 @@ class UnitTemplate(Enum):
         max_hp=15,
         attack=F(3),
         defense=F(1),
-        traits=[T.DASH, T.INDEPENDENT, T.FORTIFY, T.STATIC],  # type: ignore
+        traits={T.DASH, T.INDEPENDENT, T.FORTIFY, T.STATIC},  # type: ignore
     )
     EGG = Unit(
         cost=10,
         max_hp=10,
         attack=F(0),
         defense=F(2),
-        traits=[T.GROW, T.FORTIFY, T.STIFF, T.STATIC],
+        traits={T.GROW, T.FORTIFY, T.STIFF, T.STATIC},
     )  # type: ignore
     BABY_DRAGON = Unit(
         cost=10,
@@ -298,7 +298,7 @@ class UnitTemplate(Enum):
         attack=F(3),
         defense=F(3),
         movement=2,
-        traits=[T.GROW, T.DASH, T.ESCAPE, T.SCOUT, T.STATIC],  # type: ignore
+        traits={T.GROW, T.DASH, T.ESCAPE, T.SCOUT, T.STATIC},  # type: ignore
     )
     FIRE_DRAGON = Unit(
         cost=10,
@@ -307,7 +307,7 @@ class UnitTemplate(Enum):
         defense=F(3),
         movement=3,
         range=2,
-        traits=[T.DASH, T.SPLASH, T.SCOUT, T.STATIC],  # type: ignore
+        traits={T.DASH, T.SPLASH, T.SCOUT, T.STATIC},  # type: ignore
     )
     # Polaris
     MOONI = Unit(
@@ -315,7 +315,7 @@ class UnitTemplate(Enum):
         max_hp=10,
         attack=F(0),
         defense=F(1),
-        traits=[T.AUTO_FREEZE, T.SKATE, T.STIFF, T.STATIC],
+        traits={T.AUTO_FREEZE, T.SKATE, T.STIFF, T.STATIC},
     )  # type: ignore
     ICE_ARCHER = Unit(
         cost=3,
@@ -323,7 +323,7 @@ class UnitTemplate(Enum):
         attack=F(0),
         defense=F(1),
         range=2,
-        traits=[T.DASH, T.FREEZE, T.FORTIFY, T.STIFF],
+        traits={T.DASH, T.FREEZE, T.FORTIFY, T.STIFF},
     )  # type: ignore
     BATTLE_SLED = Unit(
         cost=5,
@@ -331,7 +331,7 @@ class UnitTemplate(Enum):
         attack=F(3),
         defense=F(2),
         movement=2,
-        traits=[T.DASH, T.ESCAPE, T.SKATE],
+        traits={T.DASH, T.ESCAPE, T.SKATE},
     )  # type: ignore
     ICE_FORTRESS = Unit(
         cost=15,
@@ -339,14 +339,14 @@ class UnitTemplate(Enum):
         attack=F(4),
         defense=F(3),
         range=2,
-        traits=[T.SKATE, T.SCOUT],
+        traits={T.SKATE, T.SCOUT},
     )  # type: ignore
     GAAMI = Unit(
         cost=10,
         max_hp=30,
         attack=F(4),
         defense=F(3),
-        traits=[T.AUTO_FREEZE, T.FREEZE_AREA, T.STATIC],
+        traits={T.AUTO_FREEZE, T.FREEZE_AREA, T.STATIC},
     )  # type: ignore
     # Cymanti
     HEXAPOD = Unit(
@@ -355,7 +355,7 @@ class UnitTemplate(Enum):
         attack=F(3),
         defense=F(1),
         movement=2,
-        traits=[T.DASH, T.ESCAPE, T.SNEAK, T.CREEP],
+        traits={T.DASH, T.ESCAPE, T.SNEAK, T.CREEP},
     )  # type: ignore
     DOOMUX = Unit(
         cost=10,
@@ -363,14 +363,14 @@ class UnitTemplate(Enum):
         attack=F(4),
         defense=F(2),
         movement=3,
-        traits=[T.DASH, T.CREEP, T.EXPLODE],
+        traits={T.DASH, T.CREEP, T.EXPLODE},
     )  # type: ignore
     KITON = Unit(
         cost=3,
         max_hp=15,
         attack=F(1),
         defense=F(3),
-        traits=[T.POISON],
+        traits={T.POISON},
     )  # type: ignore
     PHYCHI = Unit(
         cost=3,
@@ -379,14 +379,14 @@ class UnitTemplate(Enum):
         defense=F(1),
         movement=2,
         range=2,
-        traits=[T.DASH, T.POISON, T.SURPRISE],
+        traits={T.DASH, T.POISON, T.SURPRISE},
     )  # type: ignore
     SHAMAN = Unit(
         cost=5,
         max_hp=10,
         attack=F(1),
         defense=F(1),
-        traits=[T.CONVERT, T.BOOST, T.STATIC],
+        traits={T.CONVERT, T.BOOST, T.STATIC},
     )  # type: ignore
     EXIDA = Unit(
         cost=8,
@@ -394,7 +394,7 @@ class UnitTemplate(Enum):
         attack=F(3),
         defense=F(1),
         range=3,
-        traits=[T.POISON, T.SPLASH],
+        traits={T.POISON, T.SPLASH},
     )  # type: ignore
     CENTIPEDE = Unit(
         cost=10,
@@ -402,7 +402,7 @@ class UnitTemplate(Enum):
         attack=F(4),
         defense=F(3),
         movement=2,
-        traits=[T.DASH, T.EAT, T.CREEP, T.STATIC],
+        traits={T.DASH, T.EAT, T.CREEP, T.STATIC},
     )  # type: ignore
     SEGMENT = Unit(
         cost=1,
@@ -410,7 +410,7 @@ class UnitTemplate(Enum):
         attack=F(4),
         defense=F(3),
         movement=2,
-        traits=[T.DASH, T.EAT, T.CREEP, T.STATIC],
+        traits={T.DASH, T.EAT, T.CREEP, T.STATIC},
     )  # type: ignore
 
 
@@ -449,6 +449,95 @@ class UnitBuilder:
         self._current_hp_set = False
 
     # region sugar
+    @classmethod
+    def raft(cls, unit: Unit = UnitTemplate.DEFAULT_WARRIOR.value) -> "UnitBuilder":
+        """
+        Create a UnitBuilder for a raft unit.
+
+        Parameters
+        ----------
+        unit : UnitTemplate, optional
+            The unit template to derive the raft's max HP from,
+            by default UnitTemplate.DEFAULT_WARRIOR.
+
+        Returns
+        -------
+        UnitBuilder
+            An instance of UnitBuilder initialized as a raft.
+        """
+        return (
+            cls.from_template(UnitTemplate.DEFAULT_RAFT)
+            .with_max_hp(unit.max_hp)
+            .with_current_hp(unit.current_hp)
+        )
+
+    @classmethod
+    def scout(cls, unit: Unit = UnitTemplate.DEFAULT_WARRIOR.value) -> "UnitBuilder":
+        """
+        Create a UnitBuilder for a scout unit.
+
+        Parameters
+        ----------
+        unit : UnitTemplate, optional
+            The unit template to derive the scout's max HP from,
+            by default UnitTemplate.DEFAULT_WARRIOR.
+
+        Returns
+        -------
+        UnitBuilder
+            An instance of UnitBuilder initialized as a scout.
+        """
+        return (
+            cls.from_template(UnitTemplate.DEFAULT_SCOUT)
+            .with_max_hp(unit.max_hp)
+            .with_current_hp(unit.current_hp)
+        )
+
+    @classmethod
+    def rammer(cls, unit: Unit = UnitTemplate.DEFAULT_WARRIOR.value) -> "UnitBuilder":
+        """
+        Create a UnitBuilder for a rammer unit.
+
+        Parameters
+        ----------
+        unit : UnitTemplate, optional
+            The unit template to derive the rammer's max HP from,
+            by default UnitTemplate.DEFAULT_WARRIOR.
+
+        Returns
+        -------
+        UnitBuilder
+            An instance of UnitBuilder initialized as a rammer.
+        """
+        return (
+            cls.from_template(UnitTemplate.DEFAULT_RAMMER)
+            .with_max_hp(unit.max_hp)
+            .with_current_hp(unit.current_hp)
+        )
+
+    @classmethod
+    def bomber(cls, unit: Unit = UnitTemplate.DEFAULT_WARRIOR.value) -> "UnitBuilder":
+        """
+        Create a UnitBuilder for a bomber unit.
+
+        Parameters
+        ----------
+        unit : UnitTemplate, optional
+            The unit template to derive the bomber's max HP from,
+            by default UnitTemplate.DEFAULT_WARRIOR.
+
+        Returns
+        -------
+        UnitBuilder
+            An instance of UnitBuilder initialized as a bomber.
+        """
+        return (
+            cls.from_template(UnitTemplate.DEFAULT_BOMBER)
+            .with_max_hp(unit.max_hp)
+            .with_current_hp(unit.current_hp)
+        )
+
+    # no cover: start
     @classmethod
     def from_template(cls, template: UnitTemplate) -> "UnitBuilder":
         """
@@ -597,86 +686,6 @@ class UnitBuilder:
             An instance of UnitBuilder initialized as a giant.
         """
         return cls.from_template(UnitTemplate.GIANT)
-
-    @classmethod
-    def raft(cls, unit: UnitTemplate = UnitTemplate.DEFAULT_WARRIOR) -> "UnitBuilder":
-        """
-        Create a UnitBuilder for a raft unit.
-
-        Parameters
-        ----------
-        unit : UnitTemplate, optional
-            The unit template to derive the raft's max HP from,
-            by default UnitTemplate.DEFAULT_WARRIOR.
-
-        Returns
-        -------
-        UnitBuilder
-            An instance of UnitBuilder initialized as a raft.
-        """
-        return cls.from_template(UnitTemplate.DEFAULT_RAFT).with_max_hp(
-            unit.value.max_hp
-        )
-
-    @classmethod
-    def scout(cls, unit: UnitTemplate = UnitTemplate.DEFAULT_WARRIOR) -> "UnitBuilder":
-        """
-        Create a UnitBuilder for a scout unit.
-
-        Parameters
-        ----------
-        unit : UnitTemplate, optional
-            The unit template to derive the scout's max HP from,
-            by default UnitTemplate.DEFAULT_WARRIOR.
-
-        Returns
-        -------
-        UnitBuilder
-            An instance of UnitBuilder initialized as a scout.
-        """
-        return cls.from_template(UnitTemplate.DEFAULT_SCOUT).with_max_hp(
-            unit.value.max_hp
-        )
-
-    @classmethod
-    def rammer(cls, unit: UnitTemplate = UnitTemplate.DEFAULT_WARRIOR) -> "UnitBuilder":
-        """
-        Create a UnitBuilder for a rammer unit.
-
-        Parameters
-        ----------
-        unit : UnitTemplate, optional
-            The unit template to derive the rammer's max HP from,
-            by default UnitTemplate.DEFAULT_WARRIOR.
-
-        Returns
-        -------
-        UnitBuilder
-            An instance of UnitBuilder initialized as a rammer.
-        """
-        return cls.from_template(UnitTemplate.DEFAULT_RAMMER).with_max_hp(
-            unit.value.max_hp
-        )
-
-    @classmethod
-    def bomber(cls, unit: UnitTemplate = UnitTemplate.DEFAULT_WARRIOR) -> "UnitBuilder":
-        """
-        Create a UnitBuilder for a bomber unit.
-
-        Parameters
-        ----------
-        unit : UnitTemplate, optional
-            The unit template to derive the bomber's max HP from,
-            by default UnitTemplate.DEFAULT_WARRIOR.
-
-        Returns
-        -------
-        UnitBuilder
-            An instance of UnitBuilder initialized as a bomber.
-        """
-        return cls.from_template(UnitTemplate.DEFAULT_BOMBER).with_max_hp(
-            unit.value.max_hp
-        )
 
     @classmethod
     def juggernaut(cls) -> "UnitBuilder":
@@ -966,9 +975,27 @@ class UnitBuilder:
         """
         return cls.from_template(UnitTemplate.SEGMENT)
 
+    # no cover: stop
     # endregion sugar
 
     # Mutator methods
+    def with_cost(self, cost: int) -> "UnitBuilder":
+        """
+        Set the cost of the unit.
+
+        Parameters
+        ----------
+        cost : int
+            The cost to set.
+
+        Returns
+        -------
+        UnitBuilder
+            The current instance of UnitBuilder.
+        """
+        self._unit.cost = cost
+        return self
+
     def with_max_hp(self, hp: int) -> "UnitBuilder":
         """
         Set the maximum hit points for the unit.
@@ -988,6 +1015,8 @@ class UnitBuilder:
         This does not set the current HP. Use `with_current_hp` to set that separately.
         """
         self._unit.max_hp = hp
+        if self._unit.current_hp > hp:
+            self._unit.current_hp = F(hp)
         return self
 
     def with_current_hp(self, hp: F) -> "UnitBuilder":
@@ -1015,13 +1044,13 @@ class UnitBuilder:
         ):
             hp = F(self._unit.max_hp + 5)
             self._unit.status_effects.add(StatusEffect.VETERAN)
-            return self.with_max_hp(int(hp))
+            return self.with_max_hp(int(hp)).with_current_hp(hp)
 
         self._unit.current_hp = hp
         self._current_hp_set = True
         return self
 
-    def with_attack(self, attack: float) -> "UnitBuilder":
+    def with_attack(self, attack: F) -> "UnitBuilder":
         """
         Set the attack value for the unit.
 
@@ -1035,10 +1064,10 @@ class UnitBuilder:
         UnitBuilder
             The current instance of UnitBuilder.
         """
-        self._unit.attack = F(attack)
+        self._unit.attack = attack
         return self
 
-    def with_defense(self, defense: float) -> "UnitBuilder":
+    def with_defense(self, defense: F) -> "UnitBuilder":
         """
         Set the defense value for the unit.
 
@@ -1052,7 +1081,41 @@ class UnitBuilder:
         UnitBuilder
             The current instance of UnitBuilder.
         """
-        self._unit.defense = F(defense)
+        self._unit.defense = defense
+        return self
+
+    def with_movement(self, movement: int) -> "UnitBuilder":
+        """
+        Set the movement value for the unit.
+
+        Parameters
+        ----------
+        movement : float
+            The movement value to set.
+
+        Returns
+        -------
+        UnitBuilder
+            The current instance of UnitBuilder.
+        """
+        self._unit.movement = movement
+        return self
+
+    def with_range(self, range: int) -> "UnitBuilder":
+        """
+        Set the range value for the unit.
+
+        Parameters
+        ----------
+        range : float
+            The range value to set.
+
+        Returns
+        -------
+        UnitBuilder
+            The current instance of UnitBuilder.
+        """
+        self._unit.range = range
         return self
 
     def add_trait(self, trait: T) -> "UnitBuilder":
@@ -1069,8 +1132,7 @@ class UnitBuilder:
         UnitBuilder
             The current instance of UnitBuilder.
         """
-        if trait not in self._unit.traits:
-            self._unit.traits.append(trait)
+        self._unit.traits.add(trait)
         return self
 
     def add_traits(self, traits: Iterable[T]) -> "UnitBuilder":
@@ -1087,8 +1149,77 @@ class UnitBuilder:
         UnitBuilder
             The current instance of UnitBuilder.
         """
-        for trait in traits:
-            self.add_trait(trait)
+        self._unit.traits.update(traits)
+        return self
+
+    def remove_trait(self, trait: T) -> "UnitBuilder":
+        """
+        Remove a single trait from the unit.
+
+        Parameters
+        ----------
+        trait : Trait
+            The trait to remove.
+
+        Returns
+        -------
+        UnitBuilder
+            The current instance of UnitBuilder.
+        """
+        self._unit.traits.discard(trait)
+        return self
+
+    def add_status_effect(self, status_effect: StatusEffect) -> "UnitBuilder":
+        """
+        Add a single trait to the unit.
+
+        Parameters
+        ----------
+        trait : Trait
+            The trait to add.
+
+        Returns
+        -------
+        UnitBuilder
+            The current instance of UnitBuilder.
+        """
+        self._unit.status_effects.add(status_effect)
+        return self
+
+    def add_status_effects(
+        self, status_effects: Iterable[StatusEffect]
+    ) -> "UnitBuilder":
+        """
+        Add multiple traits to the unit.
+
+        Parameters
+        ----------
+        traits : Iterable[Trait]
+            An iterable of traits to add.
+
+        Returns
+        -------
+        UnitBuilder
+            The current instance of UnitBuilder.
+        """
+        self._unit.status_effects.update(status_effects)
+        return self
+
+    def remove_status_effect(self, status_effect: StatusEffect) -> "UnitBuilder":
+        """
+        Remove a single status effect from the unit.
+
+        Parameters
+        ----------
+        status_effect : Trait
+            The status effect to remove.
+
+        Returns
+        -------
+        UnitBuilder
+            The current instance of UnitBuilder.
+        """
+        self._unit.status_effects.discard(status_effect)
         return self
 
     def veteran(self) -> "UnitBuilder":
@@ -1146,7 +1277,7 @@ class UnitBuilder:
         self._defense_bonus = F(7, 10)
         return self
 
-    def defense_bonus(self) -> "UnitBuilder":
+    def fortified(self) -> "UnitBuilder":
         """
         Apply a defense bonus to the unit if not poisoned.
 
@@ -1156,10 +1287,10 @@ class UnitBuilder:
             The current instance of UnitBuilder.
         """
         if StatusEffect.POISONED not in self._unit.status_effects:
-            self._unit.status_effects.discard(StatusEffect.FORTIFIED)
+            self._unit.status_effects.add(StatusEffect.FORTIFIED)
         return self
 
-    def wall_bonus(self) -> "UnitBuilder":
+    def walled(self) -> "UnitBuilder":
         """
         Apply a wall defense bonus to the unit if not poisoned.
 

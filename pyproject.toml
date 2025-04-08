@@ -34,3 +34,8 @@ ignore = ["W505"]
 
 [tool.ruff.lint.pycodestyle]
 max-doc-length = 88
+
+[tool.coverage.report]
+exclude_also = [
+    'no cover: start(?s:.)*?no cover: stop',
+]
