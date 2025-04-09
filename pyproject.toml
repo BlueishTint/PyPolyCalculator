@@ -16,12 +16,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [dependency-groups]
-dev = [
-    "nox>=2025.2.9",
-    "pytest>=8.3.5",
-    "pytest-cov>=6.1.1",
-    "ruff>=0.11.4",
-]
+dev = ["nox>=2025.2.9", "pytest>=8.3.5", "pytest-cov>=6.1.1", "ruff>=0.11.4"]
 docs = ["esbonio>=0.16.5", "sphinx>=8.2.3", "sphinx-rtd-theme>=3.0.2"]
 
 [tool.pytest.ini_options]
@@ -36,6 +31,4 @@ ignore = ["W505"]
 max-doc-length = 88
 
 [tool.coverage.report]
-exclude_also = [
-    'no cover: start(?s:.)*?no cover: stop',
-]
+exclude_also = ["no cover: start(?s:.)*?no cover: stop"]
