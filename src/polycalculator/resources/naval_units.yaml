@@ -11,7 +11,7 @@ Bomber:
 Raft:
   attack: 0
   cost: 0
-  defense: 2
+  defense: 4
   range: 0
   traits:
     - carry
