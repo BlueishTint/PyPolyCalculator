@@ -1,7 +1,12 @@
 from abc import ABC, abstractmethod
+from importlib import resources
 from typing import TypedDict
-from polycalculator.trait import Trait
+
+import yaml
+
+import polycalculator
 from polycalculator.status_effect import StatusEffect
+from polycalculator.trait import Trait
 
 
 class UnitParams(TypedDict):
@@ -10,358 +15,23 @@ class UnitParams(TypedDict):
     attack: int
     defense: int
     range: int
-    traits: frozenset[Trait]
+    traits: list[str]
 
 
 class NavalUnitParams(TypedDict):
-    cost: int
     attack: int
+    cost: int
     defense: int
     range: int
-    traits: frozenset[Trait]
+    traits: list[str]
 
 
-UNIT_DATA: dict[str, UnitParams] = {
-    "DefaultWarrior": {
-        "cost": 2,
-        "hp": 20,
-        "attack": 4,
-        "defense": 2,
-        "range": 1,
-        "traits": frozenset((Trait.DASH, Trait.FORTIFY)),
-    },
-    "Warrior": {
-        "cost": 2,
-        "hp": 20,
-        "attack": 4,
-        "defense": 2,
-        "range": 1,
-        "traits": frozenset((Trait.DASH, Trait.FORTIFY)),
-    },
-    "Archer": {
-        "cost": 3,
-        "hp": 20,
-        "attack": 4,
-        "defense": 2,
-        "range": 2,
-        "traits": frozenset((Trait.DASH, Trait.FORTIFY)),
-    },
-    "Rider": {
-        "cost": 3,
-        "hp": 20,
-        "attack": 4,
-        "defense": 2,
-        "range": 1,
-        "traits": frozenset((Trait.DASH, Trait.ESCAPE, Trait.FORTIFY)),
-    },
-    "Catapult": {
-        "cost": 8,
-        "hp": 20,
-        "attack": 8,
-        "defense": 0,
-        "range": 3,
-        "traits": frozenset((Trait.STIFF,)),
-    },
-    "Knight": {
-        "cost": 8,
-        "hp": 20,
-        "attack": 7,
-        "defense": 2,
-        "range": 1,
-        "traits": frozenset((Trait.DASH, Trait.PERSIST)),
-    },
-    "Swordsman": {
-        "cost": 5,
-        "hp": 30,
-        "attack": 6,
-        "defense": 6,
-        "range": 1,
-        "traits": frozenset((Trait.DASH,)),
-    },
-    "Defender": {
-        "cost": 3,
-        "hp": 30,
-        "attack": 2,
-        "defense": 6,
-        "range": 1,
-        "traits": frozenset((Trait.FORTIFY,)),
-    },
-    "Cloak": {
-        "cost": 8,
-        "hp": 10,
-        "attack": 4,
-        "defense": 1,
-        "range": 1,
-        "traits": frozenset(
-            (
-                Trait.HIDE,
-                Trait.INFILTRATE,
-                Trait.DASH,
-                Trait.SCOUT,
-                Trait.CREEP,
-                Trait.STATIC,
-                Trait.STIFF,
-            )
-        ),
-    },
-    "Dagger": {
-        "cost": 2,
-        "hp": 20,
-        "attack": 4,
-        "defense": 4,
-        "range": 1,
-        "traits": frozenset(
-            (Trait.SURPRISE, Trait.DASH, Trait.INDEPENDENT, Trait.STATIC)
-        ),
-    },
-    "MindBender": {
-        "cost": 5,
-        "hp": 20,
-        "attack": 0,
-        "defense": 2,
-        "range": 1,
-        "traits": frozenset((Trait.HEAL, Trait.CONVERT, Trait.STIFF)),
-    },
-    "Giant": {
-        "cost": 10,
-        "hp": 80,
-        "attack": 10,
-        "defense": 8,
-        "range": 1,
-        "traits": frozenset((Trait.STATIC,)),
-    },
-    "Juggernaut": {
-        "cost": 10,
-        "hp": 80,
-        "attack": 9,
-        "defense": 8,
-        "range": 1,
-        "traits": frozenset((Trait.CARRY, Trait.STATIC, Trait.STIFF, Trait.STOMP)),
-    },
-    "Pirate": {
-        "cost": 2,
-        "hp": 20,
-        "attack": 4,
-        "defense": 2,
-        "range": 1,
-        "traits": frozenset(
-            (Trait.SURPRISE, Trait.DASH, Trait.INDEPENDENT, Trait.STATIC)
-        ),
-    },
-    "Tridention": {
-        "cost": 8,
-        "hp": 20,
-        "attack": 5,
-        "defense": 2,
-        "range": 2,
-        "traits": frozenset((Trait.DASH, Trait.PERSIST)),
-    },
-    "Shark": {
-        "cost": 8,
-        "hp": 20,
-        "attack": 7,
-        "defense": 4,
-        "range": 1,
-        "traits": frozenset((Trait.DASH, Trait.SURPRISE)),
-    },
-    "Jelly": {
-        "cost": 8,
-        "hp": 40,
-        "attack": 4,
-        "defense": 4,
-        "range": 1,
-        "traits": frozenset((Trait.TENTACLES, Trait.STIFF, Trait.STATIC)),
-    },
-    "Puffer": {
-        "cost": 8,
-        "hp": 20,
-        "attack": 8,
-        "defense": 0,
-        "range": 3,
-        "traits": frozenset((Trait.DRENCH,)),
-    },
-    "Crab": {
-        "cost": 10,
-        "hp": 80,
-        "attack": 8,
-        "defense": 8,
-        "range": 1,
-        "traits": frozenset((Trait.STATIC, Trait.ESCAPE, Trait.AUTOFLOOD)),
-    },
-    "Polytaur": {
-        "cost": 3,
-        "hp": 30,
-        "attack": 6,
-        "defense": 2,
-        "range": 1,
-        "traits": frozenset(
-            (Trait.DASH, Trait.INDEPENDENT, Trait.FORTIFY, Trait.STATIC)
-        ),
-    },
-    "Egg": {
-        "cost": 10,
-        "hp": 20,
-        "attack": 0,
-        "defense": 4,
-        "range": 1,
-        "traits": frozenset((Trait.GROW, Trait.FORTIFY, Trait.STIFF, Trait.STATIC)),
-    },
-    "BabyDragon": {
-        "cost": 10,
-        "hp": 30,
-        "attack": 6,
-        "defense": 6,
-        "range": 1,
-        "traits": frozenset(
-            (Trait.DASH, Trait.ESCAPE, Trait.STATIC, Trait.SCOUT, Trait.GROW)
-        ),
-    },
-    "FireDragon": {
-        "cost": 10,
-        "hp": 40,
-        "attack": 8,
-        "defense": 6,
-        "range": 2,
-        "traits": frozenset((Trait.DASH, Trait.SPLASH, Trait.STATIC, Trait.SCOUT)),
-    },
-    "Mooni": {
-        "cost": 5,
-        "hp": 20,
-        "attack": 0,
-        "defense": 2,
-        "range": 1,
-        "traits": frozenset(
-            (Trait.AUTO_FREEZE, Trait.STATIC, Trait.SKATE, Trait.STIFF)
-        ),
-    },
-    "IceArcher": {
-        "cost": 3,
-        "hp": 20,
-        "attack": 0,
-        "defense": 2,
-        "range": 2,
-        "traits": frozenset((Trait.DASH, Trait.FREEZE, Trait.STIFF, Trait.FORTIFY)),
-    },
-    "BattleSled": {
-        "cost": 5,
-        "hp": 30,
-        "attack": 6,
-        "defense": 4,
-        "range": 1,
-        "traits": frozenset((Trait.DASH, Trait.ESCAPE, Trait.SKATE)),
-    },
-    "IceFortress": {
-        "cost": 15,
-        "hp": 40,
-        "attack": 8,
-        "defense": 6,
-        "range": 2,
-        "traits": frozenset((Trait.SKATE, Trait.SCOUT)),
-    },
-    "Gaami": {
-        "cost": 10,
-        "hp": 60,
-        "attack": 8,
-        "defense": 6,
-        "range": 1,
-        "traits": frozenset((Trait.AUTO_FREEZE, Trait.FREEZE_AREA, Trait.STATIC)),
-    },
-    "Hexapod": {
-        "cost": 3,
-        "hp": 10,
-        "attack": 6,
-        "defense": 2,
-        "range": 1,
-        "traits": frozenset((Trait.DASH, Trait.ESCAPE, Trait.SNEAK, Trait.CREEP)),
-    },
-    "Doomux": {
-        "cost": 10,
-        "hp": 40,
-        "attack": 8,
-        "defense": 4,
-        "range": 1,
-        "traits": frozenset((Trait.DASH, Trait.CREEP, Trait.EXPLODE)),
-    },
-    "Kiton": {
-        "cost": 3,
-        "hp": 30,
-        "attack": 2,
-        "defense": 6,
-        "range": 1,
-        "traits": frozenset((Trait.POISON,)),
-    },
-    "Phychi": {
-        "cost": 3,
-        "hp": 10,
-        "attack": 2,
-        "defense": 2,
-        "range": 2,
-        "traits": frozenset((Trait.DASH, Trait.POISON, Trait.SURPRISE)),
-    },
-    "Shaman": {
-        "cost": 5,
-        "hp": 20,
-        "attack": 2,
-        "defense": 2,
-        "range": 1,
-        "traits": frozenset((Trait.CONVERT, Trait.BOOST, Trait.STATIC)),
-    },
-    "Exida": {
-        "cost": 8,
-        "hp": 20,
-        "attack": 6,
-        "defense": 2,
-        "range": 3,
-        "traits": frozenset((Trait.POISON, Trait.SPLASH)),
-    },
-    "Centipede": {
-        "cost": 10,
-        "hp": 40,
-        "attack": 8,
-        "defense": 6,
-        "range": 1,
-        "traits": frozenset((Trait.DASH, Trait.EAT, Trait.CREEP, Trait.STATIC)),
-    },
-    "Segment": {
-        "cost": 1,
-        "hp": 10,
-        "attack": 4,
-        "defense": 3,
-        "range": 1,
-        "traits": frozenset((Trait.EXPLODE, Trait.STATIC, Trait.STIFF)),
-    },
-}
-
-NAVAL_UNIT_DATA: dict[str, NavalUnitParams] = {
-    "Raft": {
-        "cost": 0,
-        "attack": 0,
-        "defense": 2,
-        "range": 0,
-        "traits": frozenset((Trait.CARRY, Trait.STATIC, Trait.STIFF)),
-    },
-    "Scout": {
-        "cost": 5,
-        "attack": 4,
-        "defense": 2,
-        "range": 2,
-        "traits": frozenset((Trait.DASH, Trait.CARRY, Trait.SCOUT, Trait.STATIC)),
-    },
-    "Rammer": {
-        "cost": 5,
-        "attack": 6,
-        "defense": 6,
-        "range": 1,
-        "traits": frozenset((Trait.DASH, Trait.CARRY, Trait.STATIC)),
-    },
-    "Bomber": {
-        "cost": 15,
-        "attack": 6,
-        "defense": 4,
-        "range": 3,
-        "traits": frozenset((Trait.CARRY, Trait.SPLASH, Trait.STATIC, Trait.STIFF)),
-    },
-}
+UNIT_DATA: dict[str, UnitParams] = yaml.safe_load(
+    resources.open_text(polycalculator, "resources/units.yaml")
+)
+NAVAL_UNIT_DATA: dict[str, NavalUnitParams] = yaml.safe_load(
+    resources.open_text(polycalculator, "resources/naval_units.yaml")
+)
 
 
 class Unit(ABC):
@@ -396,7 +66,16 @@ class Unit(ABC):
     def current_hp(self, value: int) -> None:
         if value < 0:
             raise ValueError("Current HP cannot be negative")
-        self._current_hp = min(value, self.max_hp)
+        if value > self.max_hp:
+            if (
+                StatusEffect.VETERAN in self._status_effects
+                or Trait.STATIC in self.traits
+            ):
+                raise ValueError("Current HP cannot exceed max HP")
+
+            self.add_status_effect(StatusEffect.VETERAN)
+
+        self._current_hp = value
 
     @property
     @abstractmethod
@@ -441,6 +120,9 @@ class Unit(ABC):
             return 1.5
         return 1.0
 
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}(cost={self.cost}, hp={self.current_hp}, attack={self.attack}, defense={self.defense}, range={self.range}, traits={self.traits})"
+
 
 def create_unit_class(
     name: str,
@@ -450,8 +132,10 @@ def create_unit_class(
     attack: int,
     defense: int,
     range: int,
-    traits: frozenset[Trait],
+    traits: list[str],
 ):
+    _traits = frozenset(Trait(trait) for trait in traits)
+
     class _Unit(Unit):
         @property
         def cost(self) -> int:
@@ -475,7 +159,7 @@ def create_unit_class(
 
         @property
         def traits(self) -> frozenset[Trait]:
-            return traits
+            return _traits
 
     _Unit.__name__ = name
     return _Unit
@@ -530,8 +214,10 @@ def create_naval_unit_class(
     attack: int,
     defense: int,
     range: int,
-    traits: frozenset[Trait],
+    traits: list[str],
 ):
+    _traits = frozenset(Trait(trait) for trait in traits)
+
     class _NavalUnit(Unit):
         def __init__(self, unit: Unit | None = None):
             if unit is None:
@@ -563,7 +249,7 @@ def create_naval_unit_class(
 
         @property
         def traits(self) -> frozenset[Trait]:
-            return traits
+            return _traits
 
     _NavalUnit.__name__ = name
     return _NavalUnit

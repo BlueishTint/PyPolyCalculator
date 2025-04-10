@@ -1,7 +1,7 @@
-from enum import Enum, auto
+from enum import StrEnum, auto
 
 
-class StatusEffect(Enum):
+class StatusEffect(StrEnum):
     """A unit status effect."""
 
     BOOSTED = auto()
