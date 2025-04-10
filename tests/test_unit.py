@@ -1,186 +1,204 @@
-from fractions import Fraction
+import pytest
 
 from polycalculator.status_effect import StatusEffect
 from polycalculator.trait import Trait
-from polycalculator.unit import Unit, UnitBuilder, UnitTemplate
+from polycalculator.unit import Defender, Giant, Raft, Warrior
 
 
-def test_unit_creation():
-    unit = Unit(cost=0, max_hp=0, attack=Fraction(0), defense=Fraction(0))  # type: ignore
-    assert unit.cost == 0
-    assert unit.max_hp == 0
-    assert unit.attack == Fraction(0)
-    assert unit.defense == Fraction(0)
-    assert unit.current_hp == Fraction(0)
-    assert unit.movement == 1
-    assert unit.range == 1
-    assert unit.status_effects == set()
-    assert unit.traits == set()
-    assert unit.defense_bonus == Fraction(1)
+class TestUnit:
+    def test_wa(self):
+        wa = Warrior()
+        assert wa.cost == 2
+        assert wa.max_hp == 20
+        assert wa.current_hp == 20
+        assert wa.attack == 4
+        assert wa.defense == 4
+        assert wa.range == 1
+        assert wa.traits == frozenset((Trait.DASH, Trait.FORTIFY))
+        assert wa.status_effects == set()
+        assert wa.defense_bonus == 1
+        assert (
+            repr(wa)
+            == "Warrior(cost=2, hp=20, attack=4, defense=4, range=1, traits=frozenset({<Trait.DASH: 'dash'>, <Trait.FORTIFY: 'fortify'>}), status_effects=set())"
+            or repr(wa)
+            == "Warrior(cost=2, hp=20, attack=4, defense=4, range=1, traits=frozenset({<Trait.FORTIFY: 'fortify'>, <Trait.DASH: 'dash'>}), status_effects=set())"
+        )
+
+    def test_wa_16(self):
+        wa = Warrior()
+        wa.current_hp = 16
+        assert wa.cost == 2
+        assert wa.max_hp == 20
+        assert wa.current_hp == 16
+        assert wa.attack == 4
+        assert wa.defense == 4
+        assert wa.range == 1
+        assert wa.traits == frozenset((Trait.DASH, Trait.FORTIFY))
+        assert wa.status_effects == set()
+        assert wa.defense_bonus == 1
+
+    def test_wa_neg_1(self):
+        wa = Warrior()
+        with pytest.raises(ValueError, match="Current HP cannot be negative"):
+            wa.current_hp = -1
+
+    def test_wa_v_36(self):
+        wa = Warrior()
+        wa.add_status_effect(StatusEffect.VETERAN)
+        wa.current_hp = 36
+        assert wa.cost == 2
+        assert wa.max_hp == 30
+        assert wa.current_hp == 30
+        assert wa.attack == 4
+        assert wa.defense == 4
+        assert wa.range == 1
+        assert wa.traits == frozenset((Trait.DASH, Trait.FORTIFY))
+        assert wa.status_effects == {StatusEffect.VETERAN}
+        assert wa.defense_bonus == 1
+
+    def test_gi_86(self):
+        gi = Giant()
+        with pytest.raises(
+            ValueError,
+            match="Cannot add the veteran status effect to a unit with the static trait",
+        ):
+            gi.current_hp = 86
+
+    def test_wa_30(self):
+        wa = Warrior()
+        wa.current_hp = 30
+        assert wa.max_hp == 30
+        assert wa.current_hp == 30
+        assert wa.attack == 4
+        assert wa.defense == 4
+        assert wa.range == 1
+        assert wa.traits == frozenset((Trait.DASH, Trait.FORTIFY))
+        assert wa.status_effects == {StatusEffect.VETERAN}
+        assert wa.defense_bonus == 1
+
+    def test_wa_v(self):
+        wa = Warrior()
+        wa.add_status_effect(StatusEffect.VETERAN)
+        assert wa.max_hp == 30
+        assert wa.current_hp == 30
+        assert wa.attack == 4
+        assert wa.defense == 4
+        assert wa.range == 1
+        assert wa.traits == frozenset((Trait.DASH, Trait.FORTIFY))
+        assert wa.status_effects == {StatusEffect.VETERAN}
+        assert wa.defense_bonus == 1
+
+    def test_wa_8_v(self):
+        wa = Warrior()
+        wa.current_hp = 8
+        wa.add_status_effect(StatusEffect.VETERAN)
+        assert wa.max_hp == 30
+        assert wa.current_hp == 8
+        assert wa.attack == 4
+        assert wa.defense == 4
+        assert wa.range == 1
+        assert wa.traits == frozenset((Trait.DASH, Trait.FORTIFY))
+        assert wa.status_effects == {StatusEffect.VETERAN}
+        assert wa.defense_bonus == 1
+
+    def test_wa_f(self):
+        wa = Warrior()
+        wa.add_status_effect(StatusEffect.FORTIFIED)
+        assert wa.max_hp == 20
+        assert wa.current_hp == 20
+        assert wa.attack == 4
+        assert wa.defense == 4
+        assert wa.range == 1
+        assert wa.traits == frozenset((Trait.DASH, Trait.FORTIFY))
+        assert wa.status_effects == {StatusEffect.FORTIFIED}
+        assert wa.defense_bonus == 1.5
+
+    def test_wa_w(self):
+        wa = Warrior()
+        wa.add_status_effect(StatusEffect.WALLED)
+        assert wa.max_hp == 20
+        assert wa.current_hp == 20
+        assert wa.attack == 4
+        assert wa.defense == 4
+        assert wa.range == 1
+        assert wa.traits == frozenset((Trait.DASH, Trait.FORTIFY))
+        assert wa.status_effects == {StatusEffect.WALLED}
+        assert wa.defense_bonus == 4.0
+
+    def test_wa_p(self):
+        wa = Warrior()
+        wa.add_status_effect(StatusEffect.POISONED)
+        assert wa.max_hp == 20
+        assert wa.current_hp == 20
+        assert wa.attack == 4
+        assert wa.defense == 4
+        assert wa.range == 1
+        assert wa.traits == frozenset((Trait.DASH, Trait.FORTIFY))
+        assert wa.status_effects == {StatusEffect.POISONED}
+        assert wa.defense_bonus == 0.7
+
+    def test_wa_w_p(self):
+        wa = Warrior()
+        wa.add_status_effect(StatusEffect.WALLED)
+        wa.add_status_effect(StatusEffect.POISONED)
+        assert wa.status_effects == {
+            StatusEffect.POISONED,
+        }
+        assert wa.defense_bonus == 0.7
+
+    def test_wa_p_w(self):
+        wa = Warrior()
+        wa.add_status_effect(StatusEffect.POISONED)
+        wa.add_status_effect(StatusEffect.WALLED)
+        assert wa.status_effects == {
+            StatusEffect.POISONED,
+        }
+        assert wa.defense_bonus == 0.7
 
 
-def test_unit_current_hp():
-    unit = Unit(cost=0, max_hp=10, attack=Fraction(0), defense=Fraction(0))  # type: ignore
-    assert unit.current_hp == Fraction(10)
+class TestNavalUnit:
+    def test_rf(self):
+        rf = Raft()
+        assert rf.cost == 2
+        assert rf.max_hp == 20
+        assert rf.current_hp == 20
+        assert rf.attack == 0
+        assert rf.defense == 4
+        assert rf.range == 0
+        assert rf.traits == frozenset((Trait.CARRY, Trait.STATIC, Trait.STIFF))
+        assert rf.status_effects == set()
+        assert rf.defense_bonus == 1
 
+    def test_rf_16(self):
+        rf = Raft()
+        rf.current_hp = 16
+        assert rf.max_hp == 20
+        assert rf.current_hp == 16
 
-def test_unit_builder_from_template():
-    unit = UnitBuilder.from_template(UnitTemplate.WARRIOR).build()
-    assert unit.attack == Fraction(2)
+    def test_rf_de(self):
+        de = Defender()
+        rf = Raft(de)
+        assert rf.cost == 3
+        assert rf.max_hp == 30
+        assert rf.current_hp == 30
 
+    def test_rf_wa_18(self):
+        wa = Warrior()
+        wa.current_hp = 18
+        rf = Raft(wa)
+        assert rf.current_hp == 18
 
-def test_unit_builder_sugar():
-    unit = UnitBuilder.centipede().build()
-    assert unit.attack == Fraction(4)
+    def test_rf_wa_p(self):
+        wa = Warrior()
+        wa.add_status_effect(StatusEffect.POISONED)
+        rf = Raft(wa)
+        assert rf.status_effects == {StatusEffect.POISONED}
+        assert rf.defense_bonus == 0.7
 
-
-def test_unit_builder_init():
-    unit = UnitBuilder(
-        Unit(
-            cost=0,
-            max_hp=0,
-            attack=Fraction(0),
-            defense=Fraction(0),
-        )  # type: ignore
-    ).build()
-    assert unit.cost == 0
-    assert unit.max_hp == 0
-    assert unit.attack == Fraction(0)
-    assert unit.defense == Fraction(0)
-    assert unit.current_hp == Fraction(0)
-    assert unit.movement == 1
-    assert unit.range == 1
-    assert unit.status_effects == set()
-    assert unit.traits == set()
-
-
-def test_unit_builder_modifications():
-    unit = (
-        UnitBuilder.from_template(UnitTemplate.WARRIOR)
-        .with_cost(0)
-        .with_attack(Fraction(3))
-        .with_defense(Fraction(1))
-        .with_movement(2)
-        .with_range(2)
-        .add_status_effect(StatusEffect.POISONED)
-        .add_status_effects({StatusEffect.FROZEN, StatusEffect.VETERAN})
-        .add_trait(Trait.FREEZE)
-        .add_traits({Trait.STIFF, Trait.DRENCH})
-        .remove_trait(Trait.DASH)
-        .build()
-    )
-    assert unit.cost == 0
-    assert unit.attack == Fraction(3)
-    assert unit.defense == Fraction(1)
-    assert unit.movement == 2
-    assert unit.range == 2
-    assert unit.status_effects == {
-        StatusEffect.POISONED,
-        StatusEffect.FROZEN,
-        StatusEffect.VETERAN,
-    }
-    assert unit.traits == {Trait.FREEZE, Trait.STIFF, Trait.DRENCH, Trait.FORTIFY}
-
-
-def test_defense_bonus():
-    unit = UnitBuilder.warrior().poisoned().build()
-    assert unit.defense_bonus == Fraction(7, 10)
-    unit = UnitBuilder.warrior().fortified().build()
-    assert unit.defense_bonus == Fraction(3, 2)
-    unit = UnitBuilder.warrior().walled().build()
-    assert unit.defense_bonus == Fraction(4)
-
-
-def test_unit_builder_max_hp():
-    unit = UnitBuilder.warrior().with_max_hp(8).build()
-    assert unit.max_hp == 8
-    assert unit.current_hp == Fraction(8)
-
-
-def test_unit_builder_current_hp():
-    unit = UnitBuilder.warrior().with_current_hp(Fraction(8)).build()
-    assert unit.max_hp == 10
-    assert unit.current_hp == Fraction(8)
-
-
-def test_unit_builder_current_hp_vet():
-    unit = UnitBuilder.warrior().with_current_hp(Fraction(15)).build()
-    assert unit.max_hp == 15
-    assert StatusEffect.VETERAN in unit.status_effects
-    assert unit.current_hp == Fraction(15)
-
-
-def test_unit_builder_veteran():
-    unit = UnitBuilder.warrior().veteran().build()
-    assert unit.max_hp == 15
-    assert StatusEffect.VETERAN in unit.status_effects
-    assert unit.current_hp == Fraction(15)
-
-
-def test_unit_builder_veteran_twice():
-    unit = UnitBuilder.warrior().with_current_hp(Fraction(15)).veteran().build()
-    assert unit.max_hp == 15
-    assert StatusEffect.VETERAN in unit.status_effects
-    assert unit.current_hp == Fraction(15)
-
-
-def test_unit_builder_boosted():
-    unit = UnitBuilder.warrior().boosted().build()
-    assert unit.attack == Fraction(5, 2)
-    assert unit.movement == 2
-    assert StatusEffect.BOOSTED in unit.status_effects
-
-
-def test_unit_builder_takes_retaliation():
-    unit = UnitBuilder.warrior().takes_retaliation().build()
-    assert StatusEffect.TAKES_RETALIATION in unit.status_effects
-
-
-def test_unit_builder_raft():
-    raft = UnitBuilder.raft().build()
-    assert raft.attack == Fraction(0)
-    assert raft.defense == Fraction(2)
-    assert raft.movement == 2
-    assert raft.range == 0
-    assert raft.traits == {Trait.CARRY, Trait.STATIC, Trait.STIFF}
-
-
-def test_unit_builder_scout():
-    scout = UnitBuilder.scout().build()
-    assert scout.attack == Fraction(2)
-    assert scout.defense == Fraction(1)
-    assert scout.movement == 3
-    assert scout.range == 2
-    assert scout.traits == {Trait.CARRY, Trait.STATIC, Trait.DASH, Trait.SCOUT}
-
-
-def test_unit_builder_rammer():
-    rammer = UnitBuilder.rammer().build()
-    assert rammer.attack == Fraction(3)
-    assert rammer.defense == Fraction(3)
-    assert rammer.movement == 3
-    assert rammer.range == 1
-    assert rammer.traits == {Trait.CARRY, Trait.STATIC, Trait.DASH}
-
-
-def test_unit_builder_bomber():
-    bomber = UnitBuilder.bomber().build()
-    assert bomber.attack == Fraction(3)
-    assert bomber.defense == Fraction(2)
-    assert bomber.movement == 2
-    assert bomber.range == 3
-    assert bomber.traits == {Trait.CARRY, Trait.STATIC, Trait.SPLASH, Trait.STIFF}
-
-
-def test_unit_remove_status_effect():
-    unit = (
-        UnitBuilder.warrior()
-        .veteran()
-        .remove_status_effect(StatusEffect.VETERAN)
-        .build()
-    )
-
-    assert unit.max_hp == 15
-    assert unit.current_hp == Fraction(15)
-    assert unit.status_effects == set()
-    assert unit.traits == {Trait.FORTIFY, Trait.DASH}
+    def test_rf_wa_v(self):
+        wa = Warrior()
+        wa.add_status_effect(StatusEffect.VETERAN)
+        rf = Raft(wa)
+        assert rf.max_hp == 30
+        assert rf.current_hp == 30
+        assert rf.status_effects == {StatusEffect.VETERAN}
