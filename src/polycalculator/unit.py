@@ -58,20 +58,15 @@ class Unit(ABC):
 
     @property
     def current_hp(self) -> int:
-        # returns self.max_hp if self._current_hp is None
-        # else returns self._current_hp
-        return self._current_hp or self.max_hp
+        return self._current_hp if self._current_hp is not None else self.max_hp
 
     @current_hp.setter
     def current_hp(self, value: int) -> None:
         if value < 0:
             raise ValueError("Current HP cannot be negative")
         if value > self.max_hp:
-            if (
-                StatusEffect.VETERAN in self._status_effects
-                or Trait.STATIC in self.traits
-            ):
-                raise ValueError("Current HP cannot exceed max HP")
+            if StatusEffect.VETERAN in self._status_effects:
+                return
 
             self.add_status_effect(StatusEffect.VETERAN)
 
@@ -99,11 +94,19 @@ class Unit(ABC):
 
     def add_status_effect(self, effect: StatusEffect) -> None:
         if effect == StatusEffect.VETERAN and Trait.STATIC in self.traits:
-            return
+            raise ValueError(
+                "Cannot add the veteran status effect to a unit with the static trait"
+            )
 
         if effect == StatusEffect.POISONED:
             self._status_effects.discard(StatusEffect.FORTIFIED)
             self._status_effects.discard(StatusEffect.WALLED)
+
+        if (
+            effect in (StatusEffect.WALLED, StatusEffect.FORTIFIED)
+            and StatusEffect.POISONED in self._status_effects
+        ):
+            return
 
         if effect == StatusEffect.WALLED:
             self._status_effects.discard(StatusEffect.FORTIFIED)
@@ -121,7 +124,7 @@ class Unit(ABC):
         return 1.0
 
     def __repr__(self) -> str:
-        return f"{self.__class__.__name__}(cost={self.cost}, hp={self.current_hp}, attack={self.attack}, defense={self.defense}, range={self.range}, traits={self.traits})"
+        return f"{self.__class__.__name__}(cost={self.cost}, hp={self.current_hp}, attack={self.attack}, defense={self.defense}, range={self.range}, traits={self.traits}, status_effects={self._status_effects})"
 
 
 def create_unit_class(
@@ -223,9 +226,10 @@ def create_naval_unit_class(
             if unit is None:
                 unit = DefaultWarrior()
             self._unit = unit
-            self._status_effects = unit.status_effects
-
-            super().__init__(unit.current_hp)
+            self._current_hp = unit.current_hp
+            self._status_effects = unit.status_effects.difference(
+                {StatusEffect.VETERAN}
+            )
 
         @property
         def cost(self) -> int:
