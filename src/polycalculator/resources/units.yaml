@@ -86,7 +86,7 @@ Dagger:
 DefaultWarrior:
   attack: 4
   cost: 2
-  defense: 2
+  defense: 4
   hp: 20
   range: 1
   traits:
@@ -348,7 +348,7 @@ Tridention:
 Warrior:
   attack: 4
   cost: 2
-  defense: 2
+  defense: 4
   hp: 20
   range: 1
   traits:
