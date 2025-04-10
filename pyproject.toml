@@ -24,8 +24,7 @@ addopts = "--cov polycalculator"
 testpaths = ["tests"]
 
 [tool.ruff.lint]
-extend-select = ["E", "W", "PT", "Q"]
-ignore = ["W505"]
+extend-select = ["PT"]
 
 [tool.ruff.lint.pycodestyle]
 max-doc-length = 88
