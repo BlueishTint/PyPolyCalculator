@@ -1,14 +1,14 @@
-from fractions import Fraction
+from copy import deepcopy
 from typing import NamedTuple
 
+from polycalculator import unit
 from polycalculator.status_effect import StatusEffect
 from polycalculator.trait import Trait
-from polycalculator.unit import Unit, UnitBuilder
 
 
-def _round_away_from_zero(x: Fraction) -> Fraction:
+def _round_away_from_zero(x: float) -> int:
     """
-    Round a Fraction away from zero.
+    Round a Fraction away from zero (positive numbers only).
 
     This is needed because Python's built-in round function rounds to the nearest
     even number when the number is exactly halfway between two integers.
@@ -16,18 +16,15 @@ def _round_away_from_zero(x: Fraction) -> Fraction:
 
     Parameters
     ----------
-    x : Fraction
+    x : float
         The number to round.
 
     Returns
     -------
-    Fraction
-        The fraction rounded away from zero.
+    int
+        The integer rounded away from zero.
     """
-    if x >= 0:
-        return Fraction(int(x + Fraction(1, 2)), 1)
-    else:
-        return Fraction(int(x - Fraction(1, 2)), 1)  # pragma: no cover
+    return int(x + 0.5)
 
 
 class DamageResult(NamedTuple):
@@ -43,8 +40,8 @@ class DamageResult(NamedTuple):
 
     """
 
-    to_attacker: Fraction
-    to_defender: Fraction
+    to_attacker: int
+    to_defender: int
 
 
 class StatusEffectResult(NamedTuple):
@@ -81,7 +78,7 @@ class CombatResult(NamedTuple):
     status_effects: StatusEffectResult
 
 
-def calculate_damage(attacker: Unit, defender: Unit) -> DamageResult:
+def calculate_damage(attacker: unit.Unit, defender: unit.Unit) -> DamageResult:
     attack_force = attacker.attack * (attacker.current_hp / attacker.max_hp)
     defense_force = (
         defender.defense
@@ -90,17 +87,17 @@ def calculate_damage(attacker: Unit, defender: Unit) -> DamageResult:
     )
     total_damage = attack_force + defense_force
     attack_result = _round_away_from_zero(
-        (attack_force / total_damage) * attacker.attack * Fraction(4.5)
+        (attack_force / total_damage) * attacker.attack * 9
     )
     defense_result = _round_away_from_zero(
-        (defense_force / total_damage) * defender.defense * Fraction(4.5)
+        (defense_force / total_damage) * defender.defense * 9
     )
 
     return DamageResult(defense_result, attack_result)
 
 
 def calculate_status_effects(
-    attacker: Unit, defender: Unit, takes_retaliation: bool
+    attacker: unit.Unit, defender: unit.Unit, takes_retaliation: bool
 ) -> StatusEffectResult:
     """
     Calculate the status effects applied to the attacker and defender.
@@ -138,7 +135,9 @@ def calculate_status_effects(
     return StatusEffectResult(to_attacker, to_defender)
 
 
-def apply_tentacle_damage(attacker: Unit, defender: Unit) -> tuple[Unit, Fraction]:
+def apply_tentacle_damage(
+    attacker: unit.Unit, defender: unit.Unit
+) -> tuple[unit.Unit, int]:
     """
     Handle cases where the defender has tentacles
 
@@ -155,29 +154,28 @@ def apply_tentacle_damage(attacker: Unit, defender: Unit) -> tuple[Unit, Fractio
         The updated attacker and the tentacle damage dealt.
     """
     if Trait.TENTACLES not in defender.traits:
-        return attacker, Fraction(0)
+        return attacker, 0
 
     if Trait.TENTACLES in attacker.traits:
         # Special case: Jelly vs Jelly
-        updated_attacker = (
-            UnitBuilder(attacker)
-            .add_status_effect(StatusEffect.TAKES_RETALIATION)
-            .build()
-        )
-        return updated_attacker, Fraction(0)
+        updated_attacker = deepcopy(attacker)
+        updated_attacker.add_status_effect(StatusEffect.TAKES_RETALIATION)
+
+        return updated_attacker, 0
 
     if attacker.range > defender.range:
-        return attacker, Fraction(0)
+        return attacker, 0
 
     # Tentacle strike happens before the attack, without retaliation.
     damage = calculate_damage(defender, attacker).to_attacker
-    updated_attacker = (
-        UnitBuilder(attacker).with_current_hp(attacker.current_hp - damage).build()
-    )
+
+    updated_attacker = deepcopy(attacker)
+    updated_attacker.current_hp -= damage
+
     return updated_attacker, damage
 
 
-def single_combat(attacker: Unit, defender: Unit) -> CombatResult:
+def single_combat(attacker: unit.Unit, defender: unit.Unit) -> CombatResult:
     """
     Simulate a single combat between two units.
 
@@ -193,7 +191,7 @@ def single_combat(attacker: Unit, defender: Unit) -> CombatResult:
     CombatResult
         The damage done and status effects applied to the attacker and defender.
     """
-    tentacle_damage = Fraction(0)
+    tentacle_damage = 0
 
     attacker, tentacle_damage = apply_tentacle_damage(attacker, defender)
 
@@ -212,7 +210,7 @@ def single_combat(attacker: Unit, defender: Unit) -> CombatResult:
     effects = calculate_status_effects(attacker, defender, takes_retaliation)
 
     damage_to_attacker = tentacle_damage + (
-        damage.to_attacker if takes_retaliation else Fraction(0)
+        damage.to_attacker if takes_retaliation else 0
     )
 
     return CombatResult(
