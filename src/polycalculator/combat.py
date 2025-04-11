@@ -1,3 +1,4 @@
+from collections.abc import Collection
 from copy import deepcopy
 from typing import NamedTuple
 
@@ -77,6 +78,16 @@ class CombatResult(NamedTuple):
 
     damage: DamageResult
     status_effects: StatusEffectResult
+
+
+class UnitResult(NamedTuple):
+    damage: int
+    status_effects: set[StatusEffect]
+
+
+class MultiCombatResult(NamedTuple):
+    attackers: list[UnitResult]
+    defenders: list[UnitResult]
 
 
 def calculate_damage(attacker: Unit, defender: Unit) -> DamageResult:
@@ -216,3 +227,76 @@ def single_combat(attacker: Unit, defender: Unit) -> CombatResult:
         damage=DamageResult(damage_to_attacker, damage.to_defender),
         status_effects=effects,
     )
+
+
+def multi_combat(
+    attackers: Collection[Unit], defenders: Collection[Unit]
+) -> MultiCombatResult:
+    """
+    Simulate a multi-combat between two units.
+
+    Parameters
+    ----------
+    attackers : Collection[Unit]
+        The attacking units.
+    defenders : Collection[Unit]
+        The defending units.
+
+    Returns
+    -------
+    MultiCombatResult
+        The damage done and status effects applied to the attackers and defenders.
+    """
+    attacker_results: list[UnitResult] = []
+    defender_results: list[UnitResult] = []
+    defenders_i = iter(enumerate(defenders))
+
+    defender_e = next(defenders_i, None)
+    if defender_e is None:
+        for attacker in attackers:
+            attacker_results.append(UnitResult(0, set()))
+        return MultiCombatResult(attackers=attacker_results, defenders=defender_results)
+
+    defender_results.append(UnitResult(0, set()))
+    i_d, defender = defender_e
+
+    for i_a, attacker in enumerate(attackers):
+        if defender.current_hp <= 0:
+            defender_e = next(defenders_i, None)
+            if defender_e is None:
+                for _ in range(i_a, len(attackers)):
+                    attacker_results.append(UnitResult(0, set()))
+                break
+            defender_results.append(UnitResult(0, set()))
+            i_d, defender = defender_e
+
+        result = single_combat(attacker, defender)
+        attacker_results.append(
+            UnitResult(result.damage.to_attacker, result.status_effects.to_attacker)
+        )
+
+        defender_results[i_d] = UnitResult(
+            defender_results[i_d].damage + result.damage.to_defender,
+            defender_results[i_d].status_effects.union(
+                result.status_effects.to_defender
+            ),
+        )
+
+        defender.current_hp -= result.damage.to_defender
+        defender.add_status_effects(result.status_effects.to_defender)
+
+    return MultiCombatResult(attackers=attacker_results, defenders=defender_results)
+
+
+if __name__ == "__main__":
+    attackers = [unit.Warrior(), unit.Warrior()]
+    defenders = [unit.Warrior()]
+    result = multi_combat(attackers, defenders)
+    print(result)
+    print("#######################################")
+    attackers = [unit.Warrior(), unit.Warrior()]
+    wa_d = unit.Warrior()
+    wa_d.add_status_effect(StatusEffect.FORTIFIED)
+    defenders = [wa_d]
+    result = multi_combat(attackers, defenders)
+    print(result)
