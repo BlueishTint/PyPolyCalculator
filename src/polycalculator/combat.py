@@ -4,6 +4,7 @@ from typing import NamedTuple
 from polycalculator import unit
 from polycalculator.status_effect import StatusEffect
 from polycalculator.trait import Trait
+from polycalculator.unit import Unit
 
 
 def _round_away_from_zero(x: float) -> int:
@@ -24,7 +25,7 @@ def _round_away_from_zero(x: float) -> int:
     int
         The integer rounded away from zero.
     """
-    return int(x + 0.5)
+    return int((x + 5) / 10) * 10
 
 
 class DamageResult(NamedTuple):
@@ -78,7 +79,7 @@ class CombatResult(NamedTuple):
     status_effects: StatusEffectResult
 
 
-def calculate_damage(attacker: unit.Unit, defender: unit.Unit) -> DamageResult:
+def calculate_damage(attacker: Unit, defender: Unit) -> DamageResult:
     attack_force = attacker.attack * (attacker.current_hp / attacker.max_hp)
     defense_force = (
         defender.defense
@@ -87,17 +88,17 @@ def calculate_damage(attacker: unit.Unit, defender: unit.Unit) -> DamageResult:
     )
     total_damage = attack_force + defense_force
     attack_result = _round_away_from_zero(
-        (attack_force / total_damage) * attacker.attack * 9
+        (attack_force / total_damage) * attacker.attack * 4.5
     )
     defense_result = _round_away_from_zero(
-        (defense_force / total_damage) * defender.defense * 9
+        (defense_force / total_damage) * defender.defense * 4.5
     )
 
     return DamageResult(defense_result, attack_result)
 
 
 def calculate_status_effects(
-    attacker: unit.Unit, defender: unit.Unit, takes_retaliation: bool
+    attacker: Unit, defender: Unit, takes_retaliation: bool
 ) -> StatusEffectResult:
     """
     Calculate the status effects applied to the attacker and defender.
@@ -135,9 +136,7 @@ def calculate_status_effects(
     return StatusEffectResult(to_attacker, to_defender)
 
 
-def apply_tentacle_damage(
-    attacker: unit.Unit, defender: unit.Unit
-) -> tuple[unit.Unit, int]:
+def apply_tentacle_damage(attacker: Unit, defender: Unit) -> tuple[Unit, int]:
     """
     Handle cases where the defender has tentacles
 
@@ -150,7 +149,7 @@ def apply_tentacle_damage(
 
     Returns
     -------
-    tuple[Unit, Fraction]
+    tuple[Unit, int]
         The updated attacker and the tentacle damage dealt.
     """
     if Trait.TENTACLES not in defender.traits:
@@ -175,7 +174,7 @@ def apply_tentacle_damage(
     return updated_attacker, damage
 
 
-def single_combat(attacker: unit.Unit, defender: unit.Unit) -> CombatResult:
+def single_combat(attacker: Unit, defender: Unit) -> CombatResult:
     """
     Simulate a single combat between two units.
 

@@ -1,7 +1,7 @@
 Bomber:
-  attack: 6
+  attack: 30
   cost: 15
-  defense: 4
+  defense: 20
   range: 3
   traits:
     - carry
@@ -11,25 +11,25 @@ Bomber:
 Raft:
   attack: 0
   cost: 0
-  defense: 4
+  defense: 20
   range: 0
   traits:
     - carry
     - static
     - stiff
 Rammer:
-  attack: 6
+  attack: 30
   cost: 5
-  defense: 6
+  defense: 30
   range: 1
   traits:
     - carry
     - dash
     - static
 Scout:
-  attack: 4
+  attack: 20
   cost: 5
-  defense: 2
+  defense: 10
   range: 2
   traits:
     - carry

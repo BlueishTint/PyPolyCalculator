@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from collections.abc import Iterable
 from importlib import resources
 from typing import TypedDict
 
@@ -36,8 +37,13 @@ NAVAL_UNIT_DATA: dict[str, NavalUnitParams] = yaml.safe_load(
 
 class Unit(ABC):
     def __init__(self, current_hp: int | None = None):
-        self._current_hp = current_hp
         self._status_effects: set[StatusEffect] = set()
+        if current_hp is None:
+            self._current_hp = None
+        elif current_hp <= 0:
+            raise ValueError("Current HP must be initialized as greater than 0")
+        else:
+            self.current_hp = current_hp
 
     @property
     @abstractmethod
@@ -53,7 +59,7 @@ class Unit(ABC):
             StatusEffect.VETERAN in self._status_effects
             and Trait.STATIC not in self.traits
         ):
-            return self._base_max_hp + 10
+            return self._base_max_hp + 50
         return self._base_max_hp
 
     @property
@@ -63,8 +69,8 @@ class Unit(ABC):
     @current_hp.setter
     def current_hp(self, value: int) -> None:
         if value < 0:
-            raise ValueError("Current HP cannot be negative")
-        if value > self.max_hp:
+            value = 0
+        elif value > self.max_hp:
             if StatusEffect.VETERAN in self._status_effects:
                 return
 
@@ -113,6 +119,10 @@ class Unit(ABC):
 
         self._status_effects.add(effect)
 
+    def add_status_effects(self, effects: Iterable[StatusEffect]) -> None:
+        for effect in effects:
+            self.add_status_effect(effect)
+
     @property
     def defense_bonus(self) -> float:
         if StatusEffect.POISONED in self._status_effects:
@@ -124,7 +134,10 @@ class Unit(ABC):
         return 1.0
 
     def __repr__(self) -> str:
-        return f"{self.__class__.__name__}(cost={self.cost}, hp={self.current_hp}, attack={self.attack}, defense={self.defense}, range={self.range}, traits={self.traits}, status_effects={self._status_effects})"
+        return f"{self.__class__.__name__}(cost={self.cost}, current_hp={self.current_hp}, max_hp={self.max_hp}, attack={self.attack}, defense={self.defense}, range={self.range}, traits={self.traits}, status_effects={self._status_effects})"
+
+    def __eq__(self, value: object) -> bool:
+        return isinstance(value, self.__class__) and self.__dict__ == value.__dict__
 
 
 def create_unit_class(

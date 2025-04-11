@@ -1,17 +1,17 @@
 Archer:
-  attack: 4
+  attack: 20
   cost: 3
-  defense: 2
-  hp: 20
+  defense: 10
+  hp: 100
   range: 2
   traits:
     - dash
     - fortify
 BabyDragon:
-  attack: 6
+  attack: 30
   cost: 10
-  defense: 6
-  hp: 30
+  defense: 30
+  hp: 150
   range: 1
   traits:
     - dash
@@ -20,28 +20,28 @@ BabyDragon:
     - scout
     - static
 BattleSled:
-  attack: 6
+  attack: 30
   cost: 5
-  defense: 4
-  hp: 30
+  defense: 20
+  hp: 150
   range: 1
   traits:
     - dash
     - escape
     - skate
 Catapult:
-  attack: 8
+  attack: 40
   cost: 8
   defense: 0
-  hp: 20
+  hp: 100
   range: 3
   traits:
     - stiff
 Centipede:
-  attack: 8
+  attack: 40
   cost: 10
-  defense: 6
-  hp: 40
+  defense: 30
+  hp: 200
   range: 1
   traits:
     - creep
@@ -49,10 +49,10 @@ Centipede:
     - eat
     - static
 Cloak:
-  attack: 4
+  attack: 20
   cost: 8
-  defense: 1
-  hp: 10
+  defense: 5
+  hp: 50
   range: 1
   traits:
     - creep
@@ -63,20 +63,20 @@ Cloak:
     - static
     - stiff
 Crab:
-  attack: 8
+  attack: 40
   cost: 10
-  defense: 8
-  hp: 80
+  defense: 40
+  hp: 400
   range: 1
   traits:
     - autoflood
     - escape
     - static
 Dagger:
-  attack: 4
+  attack: 20
   cost: 2
-  defense: 4
-  hp: 20
+  defense: 20
+  hp: 100
   range: 1
   traits:
     - dash
@@ -84,27 +84,27 @@ Dagger:
     - static
     - surprise
 DefaultWarrior:
-  attack: 4
+  attack: 20
   cost: 2
-  defense: 4
-  hp: 20
+  defense: 20
+  hp: 100
   range: 1
   traits:
     - dash
     - fortify
 Defender:
-  attack: 2
+  attack: 10
   cost: 3
-  defense: 6
-  hp: 30
+  defense: 30
+  hp: 150
   range: 1
   traits:
     - fortify
 Doomux:
-  attack: 8
+  attack: 40
   cost: 10
-  defense: 4
-  hp: 40
+  defense: 20
+  hp: 200
   range: 1
   traits:
     - creep
@@ -113,8 +113,8 @@ Doomux:
 Egg:
   attack: 0
   cost: 10
-  defense: 4
-  hp: 20
+  defense: 20
+  hp: 100
   range: 1
   traits:
     - fortify
@@ -122,19 +122,19 @@ Egg:
     - static
     - stiff
 Exida:
-  attack: 6
+  attack: 30
   cost: 8
-  defense: 2
-  hp: 20
+  defense: 10
+  hp: 100
   range: 3
   traits:
     - poison
     - splash
 FireDragon:
-  attack: 8
+  attack: 40
   cost: 10
-  defense: 6
-  hp: 40
+  defense: 30
+  hp: 200
   range: 2
   traits:
     - dash
@@ -142,28 +142,28 @@ FireDragon:
     - splash
     - static
 Gaami:
-  attack: 8
+  attack: 40
   cost: 10
-  defense: 6
-  hp: 60
+  defense: 30
+  hp: 300
   range: 1
   traits:
     - auto_freeze
     - freeze_area
     - static
 Giant:
-  attack: 10
+  attack: 50
   cost: 10
-  defense: 8
-  hp: 80
+  defense: 40
+  hp: 400
   range: 1
   traits:
     - static
 Hexapod:
-  attack: 6
+  attack: 30
   cost: 3
-  defense: 2
-  hp: 10
+  defense: 10
+  hp: 50
   range: 1
   traits:
     - creep
@@ -173,8 +173,8 @@ Hexapod:
 IceArcher:
   attack: 0
   cost: 3
-  defense: 2
-  hp: 20
+  defense: 10
+  hp: 100
   range: 2
   traits:
     - dash
@@ -182,29 +182,29 @@ IceArcher:
     - freeze
     - stiff
 IceFortress:
-  attack: 8
+  attack: 40
   cost: 15
-  defense: 6
-  hp: 40
+  defense: 30
+  hp: 200
   range: 2
   traits:
     - scout
     - skate
 Jelly:
-  attack: 4
+  attack: 20
   cost: 8
-  defense: 4
-  hp: 40
+  defense: 20
+  hp: 200
   range: 1
   traits:
     - static
     - stiff
     - tentacles
 Juggernaut:
-  attack: 9
+  attack: 45
   cost: 10
-  defense: 8
-  hp: 80
+  defense: 40
+  hp: 400
   range: 1
   traits:
     - carry
@@ -212,18 +212,18 @@ Juggernaut:
     - stiff
     - stomp
 Kiton:
-  attack: 2
+  attack: 10
   cost: 3
-  defense: 6
-  hp: 30
+  defense: 30
+  hp: 150
   range: 1
   traits:
     - poison
 Knight:
-  attack: 7
+  attack: 35
   cost: 8
-  defense: 2
-  hp: 20
+  defense: 10
+  hp: 100
   range: 1
   traits:
     - dash
@@ -231,8 +231,8 @@ Knight:
 MindBender:
   attack: 0
   cost: 5
-  defense: 2
-  hp: 20
+  defense: 10
+  hp: 100
   range: 1
   traits:
     - convert
@@ -241,8 +241,8 @@ MindBender:
 Mooni:
   attack: 0
   cost: 5
-  defense: 2
-  hp: 20
+  defense: 10
+  hp: 100
   range: 1
   traits:
     - auto_freeze
@@ -250,20 +250,20 @@ Mooni:
     - static
     - stiff
 Phychi:
-  attack: 2
+  attack: 10
   cost: 3
-  defense: 2
-  hp: 10
+  defense: 10
+  hp: 50
   range: 2
   traits:
     - dash
     - poison
     - surprise
 Pirate:
-  attack: 4
+  attack: 20
   cost: 2
-  defense: 2
-  hp: 20
+  defense: 10
+  hp: 100
   range: 1
   traits:
     - dash
@@ -271,10 +271,10 @@ Pirate:
     - static
     - surprise
 Polytaur:
-  attack: 6
+  attack: 30
   cost: 3
-  defense: 2
-  hp: 30
+  defense: 10
+  hp: 150
   range: 1
   traits:
     - dash
@@ -282,74 +282,74 @@ Polytaur:
     - independent
     - static
 Puffer:
-  attack: 8
+  attack: 40
   cost: 8
   defense: 0
-  hp: 20
+  hp: 100
   range: 3
   traits:
     - drench
 Rider:
-  attack: 4
+  attack: 20
   cost: 3
-  defense: 2
-  hp: 20
+  defense: 10
+  hp: 100
   range: 1
   traits:
     - dash
     - escape
     - fortify
 Segment:
-  attack: 4
+  attack: 20
   cost: 1
-  defense: 3
-  hp: 10
+  defense: 15
+  hp: 50
   range: 1
   traits:
     - explode
     - static
     - stiff
 Shaman:
-  attack: 2
+  attack: 10
   cost: 5
-  defense: 2
-  hp: 20
+  defense: 10
+  hp: 100
   range: 1
   traits:
     - boost
     - convert
     - static
 Shark:
-  attack: 7
+  attack: 35
   cost: 8
-  defense: 4
-  hp: 20
+  defense: 20
+  hp: 100
   range: 1
   traits:
     - dash
     - surprise
 Swordsman:
-  attack: 6
+  attack: 30
   cost: 5
-  defense: 6
-  hp: 30
+  defense: 30
+  hp: 150
   range: 1
   traits:
     - dash
 Tridention:
-  attack: 5
+  attack: 25
   cost: 8
-  defense: 2
-  hp: 20
+  defense: 10
+  hp: 100
   range: 2
   traits:
     - dash
     - persist
 Warrior:
-  attack: 4
+  attack: 20
   cost: 2
-  defense: 4
-  hp: 20
+  defense: 20
+  hp: 100
   range: 1
   traits:
     - dash
