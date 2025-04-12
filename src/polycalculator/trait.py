@@ -1,7 +1,7 @@
-from enum import Enum, auto
+from enum import StrEnum, auto
 
 
-class Trait(Enum):
+class Trait(StrEnum):
     """A unit trait."""
 
     # Normal

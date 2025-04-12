@@ -1,13 +1,12 @@
-from polycalculator.combat import single_combat
+from polycalculator import unit
+from polycalculator.combat import multi_combat, single_combat
 from polycalculator.status_effect import StatusEffect
 from polycalculator.trait import Trait
-from polycalculator.unit import Unit, UnitBuilder, UnitTemplate
 
 __all__ = [
-    "Unit",
-    "UnitBuilder",
-    "UnitTemplate",
+    "unit",
     "Trait",
     "StatusEffect",
     "single_combat",
+    "multi_combat",
 ]

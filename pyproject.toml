@@ -6,7 +6,9 @@ readme = "README.md"
 license = { file = "LICENSE" }
 authors = [{ name = "BlueishTint", email = "bluetintisacolor@gmail.com" }]
 requires-python = ">=3.13"
-dependencies = ["attrs>=25.3.0"]
+dependencies = [
+    "pyyaml>=6.0.2",
+]
 
 [project.scripts]
 polycalculator = "polycalculator:main"
@@ -24,8 +26,7 @@ addopts = "--cov polycalculator"
 testpaths = ["tests"]
 
 [tool.ruff.lint]
-extend-select = ["E", "W", "PT", "Q"]
-ignore = ["W505"]
+extend-select = ["PT"]
 
 [tool.ruff.lint.pycodestyle]
 max-doc-length = 88

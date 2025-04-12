@@ -1,0 +1,38 @@
+Bomber:
+  attack: 30
+  cost: 15
+  defense: 20
+  range: 3
+  traits:
+    - carry
+    - splash
+    - static
+    - stiff
+Raft:
+  attack: 0
+  cost: 0
+  defense: 20
+  range: 0
+  traits:
+    - carry
+    - static
+    - stiff
+Rammer:
+  attack: 30
+  cost: 5
+  defense: 30
+  range: 1
+  traits:
+    - carry
+    - dash
+    - static
+Scout:
+  attack: 20
+  cost: 5
+  defense: 10
+  range: 2
+  traits:
+    - carry
+    - dash
+    - scout
+    - static
