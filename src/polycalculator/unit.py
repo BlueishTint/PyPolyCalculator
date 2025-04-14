@@ -79,6 +79,10 @@ class Unit(ABC):
         self._current_hp = value
 
     @property
+    def health_ratio(self) -> float:
+        return self.current_hp / self.max_hp
+
+    @property
     @abstractmethod
     def attack(self) -> int: ...
 

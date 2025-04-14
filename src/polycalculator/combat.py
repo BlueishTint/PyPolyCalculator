@@ -1,5 +1,4 @@
 from collections.abc import Collection
-from copy import deepcopy
 from typing import NamedTuple
 
 from polycalculator import unit
@@ -90,20 +89,48 @@ class MultiCombatResult(NamedTuple):
     defenders: list[UnitResult]
 
 
-def calculate_damage(attacker: Unit, defender: Unit) -> DamageResult:
-    attack_force = attacker.attack * (attacker.current_hp / attacker.max_hp)
-    defense_force = (
-        defender.defense
-        * (defender.current_hp / defender.max_hp)
-        * defender.defense_bonus
+def calculate_attacker_damage(
+    attack: int,
+    attacker_health_ratio: float,
+    defense: int,
+    defender_health_ratio: float,
+    defense_bonus: float,
+) -> int:
+    return _round_away_from_zero(
+        4.5
+        * attack
+        * (effective_attack := attack * attacker_health_ratio)
+        / (effective_attack + defense * defender_health_ratio * defense_bonus)
     )
+
+
+def calculate_defender_damage(
+    defense: int,
+    defender_health_ratio: float,
+    attack: int,
+    attacker_health_ratio: float,
+    defense_bonus: float,
+) -> int:
+    return _round_away_from_zero(
+        4.5
+        * defense
+        * (effective_defense := defense * defender_health_ratio * defense_bonus)
+        / (effective_defense + attack * attacker_health_ratio)
+    )
+
+
+def calculate_damage(
+    attack: int,
+    attacker_health_ratio: float,
+    defense: int,
+    defender_health_ratio: float,
+    defense_bonus: float,
+) -> DamageResult:
+    attack_force = attack * attacker_health_ratio
+    defense_force = defense * defender_health_ratio * defense_bonus
     total_damage = attack_force + defense_force
-    attack_result = _round_away_from_zero(
-        (attack_force / total_damage) * attacker.attack * 4.5
-    )
-    defense_result = _round_away_from_zero(
-        (defense_force / total_damage) * defender.defense * 4.5
-    )
+    attack_result = _round_away_from_zero(attack_force / total_damage * attack * 4.5)
+    defense_result = _round_away_from_zero(defense_force / total_damage * defense * 4.5)
 
     return DamageResult(defense_result, attack_result)
 
@@ -131,9 +158,8 @@ def calculate_status_effects(
     to_attacker: set[StatusEffect] = set()
     to_defender: set[StatusEffect] = set()
 
-    if takes_retaliation:
-        if Trait.POISON in defender.traits:
-            to_attacker.add(StatusEffect.POISONED)
+    if takes_retaliation and Trait.POISON in defender.traits:
+        to_attacker.add(StatusEffect.POISONED)
 
     if Trait.POISON in attacker.traits:
         to_defender.add(StatusEffect.POISONED)
@@ -145,44 +171,6 @@ def calculate_status_effects(
         to_defender.add(StatusEffect.CONVERTED)
 
     return StatusEffectResult(to_attacker, to_defender)
-
-
-def apply_tentacle_damage(attacker: Unit, defender: Unit) -> tuple[Unit, int]:
-    """
-    Handle cases where the defender has tentacles
-
-    Parameters
-    ----------
-    attacker : Unit
-        The attacking unit.
-    defender : Unit
-        The defending unit.
-
-    Returns
-    -------
-    tuple[Unit, int]
-        The updated attacker and the tentacle damage dealt.
-    """
-    if Trait.TENTACLES not in defender.traits:
-        return attacker, 0
-
-    if Trait.TENTACLES in attacker.traits:
-        # Special case: Jelly vs Jelly
-        updated_attacker = deepcopy(attacker)
-        updated_attacker.add_status_effect(StatusEffect.TAKES_RETALIATION)
-
-        return updated_attacker, 0
-
-    if attacker.range > defender.range:
-        return attacker, 0
-
-    # Tentacle strike happens before the attack, without retaliation.
-    damage = calculate_damage(defender, attacker).to_attacker
-
-    updated_attacker = deepcopy(attacker)
-    updated_attacker.current_hp -= damage
-
-    return updated_attacker, damage
 
 
 def single_combat(attacker: Unit, defender: Unit) -> CombatResult:
@@ -203,9 +191,28 @@ def single_combat(attacker: Unit, defender: Unit) -> CombatResult:
     """
     tentacle_damage = 0
 
-    attacker, tentacle_damage = apply_tentacle_damage(attacker, defender)
+    if Trait.TENTACLES in defender.traits:
+        if Trait.TENTACLES in attacker.traits:
+            # Special case: Jelly vs Jelly
+            attacker.add_status_effect(StatusEffect.TAKES_RETALIATION)
+        elif attacker.range > defender.range:
+            pass
+        else:
+            tentacle_damage = calculate_attacker_damage(
+                attacker.attack,
+                attacker.health_ratio,
+                defender.defense,
+                defender.health_ratio,
+                defender.defense_bonus,
+            )
 
-    damage = calculate_damage(attacker, defender)
+    damage = calculate_damage(
+        attacker.attack,
+        attacker.health_ratio,
+        defender.defense,
+        defender.health_ratio,
+        defender.defense_bonus,
+    )
 
     takes_retaliation = StatusEffect.TAKES_RETALIATION in attacker.status_effects or (
         attacker.range <= defender.range
