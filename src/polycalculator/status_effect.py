@@ -14,6 +14,8 @@ class StatusEffect(StrEnum):
     """The unit cannot use any actions."""
     POISONED = auto()
     """Reduces a unit's defense by 30% and removes all defense bonuses."""
+    SPLASHING = auto()
+    """The unit deals splash damage to adjacent enemies."""
     TAKES_RETALIATION = auto()
     """The unit takes retaliation even if it has more range or the SURPRISE trait."""
     VETERAN = auto()

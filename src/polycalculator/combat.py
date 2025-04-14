@@ -1,7 +1,6 @@
 from collections.abc import Collection
 from typing import NamedTuple
 
-from polycalculator import unit
 from polycalculator.status_effect import StatusEffect
 from polycalculator.trait import Trait
 from polycalculator.unit import Unit
@@ -125,12 +124,16 @@ def calculate_damage(
     defense: int,
     defender_health_ratio: float,
     defense_bonus: float,
+    splashing: bool = False,
 ) -> DamageResult:
     attack_force = attack * attacker_health_ratio
     defense_force = defense * defender_health_ratio * defense_bonus
     total_damage = attack_force + defense_force
     attack_result = _round_away_from_zero(attack_force / total_damage * attack * 4.5)
     defense_result = _round_away_from_zero(defense_force / total_damage * defense * 4.5)
+
+    if splashing:
+        attack_result = attack_result // 2
 
     return DamageResult(defense_result, attack_result)
 
@@ -212,11 +215,12 @@ def single_combat(attacker: Unit, defender: Unit) -> CombatResult:
         defender.defense,
         defender.health_ratio,
         defender.defense_bonus,
+        StatusEffect.SPLASHING in attacker.status_effects,
     )
 
     takes_retaliation = StatusEffect.TAKES_RETALIATION in attacker.status_effects or (
         attacker.range <= defender.range
-        and defender.current_hp - damage.to_defender > 0
+        and (defender.current_hp - damage.to_defender) > 0
         and Trait.STIFF not in defender.traits
         and Trait.SURPRISE not in attacker.traits
         and Trait.CONVERT not in attacker.traits
@@ -293,17 +297,3 @@ def multi_combat(
         defender.add_status_effects(result.status_effects.to_defender)
 
     return MultiCombatResult(attackers=attacker_results, defenders=defender_results)
-
-
-if __name__ == "__main__":
-    attackers = [unit.Warrior(), unit.Warrior()]
-    defenders = [unit.Warrior()]
-    result = multi_combat(attackers, defenders)
-    print(result)
-    print("#######################################")
-    attackers = [unit.Warrior(), unit.Warrior()]
-    wa_d = unit.Warrior()
-    wa_d.add_status_effect(StatusEffect.FORTIFIED)
-    defenders = [wa_d]
-    result = multi_combat(attackers, defenders)
-    print(result)
