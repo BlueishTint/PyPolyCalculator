@@ -144,7 +144,7 @@ class Unit(ABC):
         return isinstance(value, self.__class__) and self.__dict__ == value.__dict__
 
 
-def create_unit_class(
+def _create_unit_class(
     name: str,
     *,
     cost: int,
@@ -186,7 +186,7 @@ def create_unit_class(
 
 
 UnitRegistry = {
-    name: create_unit_class(name, **params) for name, params in UNIT_DATA.items()
+    name: _create_unit_class(name, **params) for name, params in UNIT_DATA.items()
 }
 
 DefaultWarrior = UnitRegistry["DefaultWarrior"]
@@ -227,7 +227,44 @@ Centipede = UnitRegistry["Centipede"]
 Segment = UnitRegistry["Segment"]
 
 
-def create_naval_unit_class(
+class NavalUnit(Unit):
+    def __init__(self, unit: Unit | None = None):
+        if unit is None:
+            unit = DefaultWarrior()
+        self._unit = unit
+
+    @property
+    def _base_max_hp(self) -> int:
+        return self._unit._base_max_hp
+
+    @property
+    def max_hp(self) -> int:
+        return self._unit.max_hp
+
+    @property
+    def current_hp(self) -> int:
+        return self._unit.current_hp
+
+    @current_hp.setter
+    def current_hp(self, value: int) -> None:
+        self._unit.current_hp = value
+
+    @property
+    def status_effects(self) -> set[StatusEffect]:
+        return self._unit.status_effects
+
+    def add_status_effect(self, effect: StatusEffect) -> None:
+        self._unit.add_status_effect(effect)
+
+    @property
+    def defense_bonus(self) -> float:
+        return self._unit.defense_bonus
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}(cost={self.cost}, current_hp={self.current_hp}, max_hp={self.max_hp}, attack={self.attack}, defense={self.defense}, range={self.range}, traits={self.traits}, status_effects={self._unit.status_effects}, _unit={repr(self._unit)})"
+
+
+def _create_naval_unit_class(
     name: str,
     *,
     cost: int,
@@ -238,15 +275,11 @@ def create_naval_unit_class(
 ):
     _traits = frozenset(Trait(trait) for trait in traits)
 
-    class _NavalUnit(Unit):
+    class _NavalUnit(NavalUnit):
         def __init__(self, unit: Unit | None = None):
             if unit is None:
                 unit = DefaultWarrior()
             self._unit = unit
-            self._current_hp = unit.current_hp
-            self._status_effects = unit.status_effects.difference(
-                {StatusEffect.VETERAN}
-            )
 
         @property
         def cost(self) -> int:
@@ -277,7 +310,7 @@ def create_naval_unit_class(
 
 
 NavalUnitRegistry = {
-    name: create_naval_unit_class(name, **params)
+    name: _create_naval_unit_class(name, **params)
     for name, params in NAVAL_UNIT_DATA.items()
 }
 
