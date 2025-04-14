@@ -75,6 +75,8 @@ class Unit(ABC):
                 return
 
             self.add_status_effect(StatusEffect.VETERAN)
+            self._current_hp = None
+            return
 
         self._current_hp = value
 
@@ -367,17 +369,25 @@ for name, cls in NavalUnitRegistry.items():
         if abbr not in _naval_abbr_map:
             _naval_abbr_map[abbr] = cls
 
+
 # endregion Build maps
 
 _ABBR_MAP = _abbr_map
 _NAVAL_ABBR_MAP = _naval_abbr_map
+_EFFECT_ABBR_MAP = {
+    abbr: StatusEffect(effect)
+    for abbr, effect in yaml.safe_load(
+        resources.open_text(polycalculator, "resources/effect_abbrs.yaml")
+    ).items()
+}
 
 
 def parse_unit(s: str) -> Unit | None:
     parts = s.lower().split()
     hp: float | None = None
-    unit: type[Unit] | None = None
-    naval: type[NavalUnit] | None = None
+    unit_cls: type[Unit] | None = None
+    naval_cls: type[NavalUnit] | None = None
+    status_effects: set[StatusEffect] = set()
 
     for part in parts:
         try:
@@ -387,17 +397,25 @@ def parse_unit(s: str) -> Unit | None:
             pass
 
         if part in _ABBR_MAP:
-            unit = _ABBR_MAP[part]
+            unit_cls = _ABBR_MAP[part]
         elif part in _NAVAL_ABBR_MAP:
-            naval = _NAVAL_ABBR_MAP[part]
+            naval_cls = _NAVAL_ABBR_MAP[part]
+        elif part in _EFFECT_ABBR_MAP:
+            status_effects.add(_EFFECT_ABBR_MAP[part])
         else:
-            # TODO: add status effects
             print(f"Skipping unknown part {part}")
 
-    if not hp or not unit:
+    if not unit_cls and not naval_cls:
         return None
 
-    if naval:
-        return naval(unit(int(hp * 10)))
+    if unit_cls:
+        unit = unit_cls(int(hp * 10) if hp is not None else None)
+    else:
+        unit = DefaultWarrior(int(hp * 10) if hp is not None else None)
 
-    return unit(int(hp * 10))
+    unit.add_status_effects(status_effects)
+
+    if naval_cls:
+        return naval_cls(unit)
+
+    return unit
