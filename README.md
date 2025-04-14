@@ -12,8 +12,8 @@ Good question. There are two answers:
 
 - [x] Unit representation
 - [x] Single combat
-- [ ] Multiple combat
-- [ ] A* graph to find optimal order
+- [x] Multiple combat
+- [ ] Optimal attack order
 - [ ] Discord bot
 - [ ] /c and /o commands
 - [ ] /units command
