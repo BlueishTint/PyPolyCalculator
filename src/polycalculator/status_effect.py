@@ -8,6 +8,8 @@ class StatusEffect(StrEnum):
     """The unit's movement is increased by 1 and attack is increased by 0.5."""
     CONVERTED = auto()
     """The unit is converted to the enemy's side."""
+    EXPLODING = auto()
+    """The unit deals explosion damage to adjacent enemies."""
     FORTIFIED = auto()
     """The unit's defense is increased by 50%."""
     FROZEN = auto()

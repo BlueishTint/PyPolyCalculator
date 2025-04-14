@@ -124,7 +124,7 @@ def calculate_damage(
     defense: int,
     defender_health_ratio: float,
     defense_bonus: float,
-    splashing: bool = False,
+    halved: bool = False,
 ) -> DamageResult:
     attack_force = attack * attacker_health_ratio
     defense_force = defense * defender_health_ratio * defense_bonus
@@ -132,7 +132,7 @@ def calculate_damage(
     attack_result = _round_away_from_zero(attack_force / total_damage * attack * 4.5)
     defense_result = _round_away_from_zero(defense_force / total_damage * defense * 4.5)
 
-    if splashing:
+    if halved:
         attack_result = attack_result // 2
 
     return DamageResult(defense_result, attack_result)
@@ -215,7 +215,8 @@ def single_combat(attacker: Unit, defender: Unit) -> CombatResult:
         defender.defense,
         defender.health_ratio,
         defender.defense_bonus,
-        StatusEffect.SPLASHING in attacker.status_effects,
+        StatusEffect.SPLASHING in attacker.status_effects
+        or StatusEffect.EXPLODING in attacker.status_effects,
     )
 
     takes_retaliation = StatusEffect.TAKES_RETALIATION in attacker.status_effects or (
@@ -230,8 +231,10 @@ def single_combat(attacker: Unit, defender: Unit) -> CombatResult:
 
     effects = calculate_status_effects(attacker, defender, takes_retaliation)
 
-    damage_to_attacker = tentacle_damage + (
-        damage.to_attacker if takes_retaliation else 0
+    damage_to_attacker = (
+        tentacle_damage + (damage.to_attacker if takes_retaliation else 0)
+        if StatusEffect.EXPLODING not in attacker.status_effects
+        else attacker.current_hp
     )
 
     return CombatResult(

@@ -106,9 +106,7 @@ class Unit(ABC):
 
     def add_status_effect(self, effect: StatusEffect) -> None:
         if effect == StatusEffect.VETERAN and Trait.STATIC in self.traits:
-            raise ValueError(
-                "Cannot add the veteran status effect to a unit with the static trait"
-            )
+            return
 
         if effect == StatusEffect.POISONED:
             self._status_effects.discard(StatusEffect.FORTIFIED)
@@ -122,6 +120,12 @@ class Unit(ABC):
 
         if effect == StatusEffect.WALLED:
             self._status_effects.discard(StatusEffect.FORTIFIED)
+
+        if effect == StatusEffect.SPLASHING and Trait.SPLASH not in self.traits:
+            return
+
+        if effect == StatusEffect.EXPLODING and Trait.EXPLODE not in self.traits:
+            return
 
         self._status_effects.add(effect)
 
