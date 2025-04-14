@@ -318,3 +318,86 @@ Raft = NavalUnitRegistry["Raft"]
 Scout = NavalUnitRegistry["Scout"]
 Rammer = NavalUnitRegistry["Rammer"]
 Bomber = NavalUnitRegistry["Bomber"]
+
+
+_ABBR_OVERRIDES: dict[str, str] = yaml.safe_load(
+    resources.open_text(polycalculator, "resources/abbr_overrides.yaml")
+)
+
+_NAVAL_ABBR_OVERRIDES: dict[str, str] = yaml.safe_load(
+    resources.open_text(polycalculator, "resources/naval_abbr_overrides.yaml")
+)
+
+# region Build maps
+_abbr_map: dict[str, type[Unit]] = {}
+
+for name, cls in set(UnitRegistry.items()).difference(
+    (("DefaultWarrior", DefaultWarrior),)
+):
+    name = name.lower()
+
+    # Add custom abbreviations first so they take priority
+    for abbr, target_name in _ABBR_OVERRIDES.items():
+        if target_name == name:
+            _abbr_map[abbr] = cls
+
+    # Add all valid prefixes if not already overridden
+    for i in range(2, len(name) + 1):
+        abbr = name[:i]
+        if abbr in _NAVAL_ABBR_OVERRIDES.keys():
+            continue
+        if abbr not in _abbr_map:
+            _abbr_map[abbr] = cls
+
+_naval_abbr_map: dict[str, type[NavalUnit]] = {}
+
+for name, cls in NavalUnitRegistry.items():
+    name = name.lower()
+
+    # Add custom abbreviations first so they take priority
+    for abbr, target_name in _NAVAL_ABBR_OVERRIDES.items():
+        if target_name == name:
+            _naval_abbr_map[abbr] = cls
+
+    # Add all valid prefixes if not already overridden
+    for i in range(2, len(name) + 1):
+        abbr = name[:i]
+        if abbr in _NAVAL_ABBR_OVERRIDES.keys():
+            continue
+        if abbr not in _naval_abbr_map:
+            _naval_abbr_map[abbr] = cls
+
+# endregion Build maps
+
+_ABBR_MAP = _abbr_map
+_NAVAL_ABBR_MAP = _naval_abbr_map
+
+
+def parse_unit(s: str) -> Unit | None:
+    parts = s.lower().split()
+    hp: float | None = None
+    unit: type[Unit] | None = None
+    naval: type[NavalUnit] | None = None
+
+    for part in parts:
+        try:
+            hp = float(part)
+            continue
+        except ValueError:
+            pass
+
+        if part in _ABBR_MAP:
+            unit = _ABBR_MAP[part]
+        elif part in _NAVAL_ABBR_MAP:
+            naval = _NAVAL_ABBR_MAP[part]
+        else:
+            # TODO: add status effects
+            print(f"Skipping unknown part {part}")
+
+    if not hp or not unit:
+        return None
+
+    if naval:
+        return naval(unit(int(hp * 10)))
+
+    return unit(int(hp * 10))
