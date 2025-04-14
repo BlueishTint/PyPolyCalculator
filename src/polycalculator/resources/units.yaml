@@ -201,7 +201,7 @@ Jelly:
     - stiff
     - tentacles
 Juggernaut:
-  attack: 45
+  attack: 40
   cost: 10
   defense: 40
   hp: 400
