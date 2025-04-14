@@ -289,6 +289,17 @@ Puffer:
   range: 3
   traits:
     - drench
+Raychi:
+  attack: 30
+  cost: 8
+  defense: 20
+  hp: 150
+  range: 1
+  traits:
+    - creep
+    - dash
+    - explode
+    - navigate
 Rider:
   attack: 20
   cost: 3

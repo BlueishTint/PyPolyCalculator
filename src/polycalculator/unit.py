@@ -322,6 +322,7 @@ Rammer = NavalUnitRegistry["Rammer"]
 Bomber = NavalUnitRegistry["Bomber"]
 
 
+# region Build maps
 _ABBR_OVERRIDES: dict[str, str] = yaml.safe_load(
     resources.open_text(polycalculator, "resources/abbr_overrides.yaml")
 )
@@ -329,8 +330,6 @@ _ABBR_OVERRIDES: dict[str, str] = yaml.safe_load(
 _NAVAL_ABBR_OVERRIDES: dict[str, str] = yaml.safe_load(
     resources.open_text(polycalculator, "resources/naval_abbr_overrides.yaml")
 )
-
-# region Build maps
 _abbr_map: dict[str, type[Unit]] = {}
 
 for name, cls in set(UnitRegistry.items()).difference(
@@ -351,6 +350,7 @@ for name, cls in set(UnitRegistry.items()).difference(
         if abbr not in _abbr_map:
             _abbr_map[abbr] = cls
 
+_ABBR_MAP = _abbr_map
 _naval_abbr_map: dict[str, type[NavalUnit]] = {}
 
 for name, cls in NavalUnitRegistry.items():
@@ -364,15 +364,11 @@ for name, cls in NavalUnitRegistry.items():
     # Add all valid prefixes if not already overridden
     for i in range(2, len(name) + 1):
         abbr = name[:i]
-        if abbr in _NAVAL_ABBR_OVERRIDES.keys():
+        if abbr in _ABBR_MAP.keys():
             continue
         if abbr not in _naval_abbr_map:
             _naval_abbr_map[abbr] = cls
 
-
-# endregion Build maps
-
-_ABBR_MAP = _abbr_map
 _NAVAL_ABBR_MAP = _naval_abbr_map
 _EFFECT_ABBR_MAP = {
     abbr: StatusEffect(effect)
@@ -380,6 +376,7 @@ _EFFECT_ABBR_MAP = {
         resources.open_text(polycalculator, "resources/effect_abbrs.yaml")
     ).items()
 }
+# endregion Build maps
 
 
 def parse_unit(s: str) -> Unit | None:
