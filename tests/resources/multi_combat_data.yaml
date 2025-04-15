@@ -1,0 +1,21 @@
+- attackers: [ wa, wa ]
+  defenders: [ wa d ]
+  attacker_results:
+  - damage: 50
+    effects: []
+  - damage: 40
+    effects: []
+  defender_results:
+  - damage: 90
+    effects: []
+
+- attackers: [ wa, wa ]
+  defenders: [ je ]
+  attacker_results:
+  - damage: 50
+    effects: []
+  - damage: 40
+    effects: []
+  defender_results:
+  - damage: 70
+    effects: []

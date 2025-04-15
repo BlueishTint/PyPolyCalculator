@@ -1,402 +1,131 @@
-from polycalculator import unit
-from polycalculator.combat import (
-    CombatResult,
-    DamageResult,
-    StatusEffectResult,
-    apply_tentacle_damage,
-    _calculate_damage,
-    _calculate_status_effects,
-    single_combat,
-)
+from pathlib import Path
+from typing import TypedDict
+
+import pytest
+import yaml
+
+from polycalculator import combat, unit
 from polycalculator.status_effect import StatusEffect
 
-
-class TestCalculateDamage:
-    def test_wa_wa(self):
-        result = _calculate_damage(unit.Warrior(), unit.Warrior())
-        expected_result = DamageResult(50, 50)
-        assert expected_result.to_attacker == result.to_attacker
-        assert expected_result.to_defender == result.to_defender
-
-    def test_je_je(self):
-        result = _calculate_damage(unit.Jelly(), unit.Jelly())
-        expected_result = DamageResult(50, 50)
-        assert expected_result.to_attacker == result.to_attacker
-        assert expected_result.to_defender == result.to_defender
-
-    def test_injured_wa_injured_wa_d(self):
-        wa1 = unit.Warrior(50)
-        wa2 = unit.Warrior(50)
-        wa2.add_status_effect(unit.StatusEffect.FORTIFIED)
-        result = _calculate_damage(wa1, wa2)
-        expected_result = DamageResult(50, 40)
-        assert expected_result.to_attacker == result.to_attacker
-        assert expected_result.to_defender == result.to_defender
-
-    def test_wa_injured_wa(self):
-        wa1 = unit.Warrior()
-        wa2 = unit.Warrior(50)
-        result = _calculate_damage(wa1, wa2)
-        expected_result = DamageResult(30, 60)
-        assert expected_result.to_attacker == result.to_attacker
-        assert expected_result.to_defender == result.to_defender
-
-    def test_je_injured_wa(self):
-        je = unit.Jelly()
-        wa = unit.Warrior(50)
-        result = _calculate_damage(je, wa)
-        expected_result = DamageResult(30, 60)
-        assert expected_result.to_attacker == result.to_attacker
-        assert expected_result.to_defender == result.to_defender
-
-    def test_sh_wa(self):
-        result = _calculate_damage(unit.Shaman(), unit.Warrior())
-        expected_result = DamageResult(60, 20)
-        assert expected_result.to_attacker == result.to_attacker
-        assert expected_result.to_defender == result.to_defender
+# region: Setup
 
 
-class TestCalculateStatusEffects:
-    def test_wa_wa(self):
-        result = _calculate_status_effects(unit.Warrior(), unit.Warrior(), True)
-        expected_result = StatusEffectResult(set(), set())
-        assert expected_result.to_attacker == result.to_attacker
-        assert expected_result.to_defender == result.to_defender
-
-    def test_ph_wa(self):
-        result = _calculate_status_effects(unit.Phychi(), unit.Warrior(), False)
-        expected_result = StatusEffectResult(set(), {StatusEffect.POISONED})
-        assert expected_result.to_attacker == result.to_attacker
-        assert expected_result.to_defender == result.to_defender
-
-    def test_ia_wa(self):
-        result = _calculate_status_effects(unit.IceArcher(), unit.Warrior(), False)
-        expected_result = StatusEffectResult(set(), {StatusEffect.FROZEN})
-        assert expected_result.to_attacker == result.to_attacker
-        assert expected_result.to_defender == result.to_defender
-
-    def test_wa_ia(self):
-        result = _calculate_status_effects(unit.Warrior(), unit.IceArcher(), False)
-        expected_result = StatusEffectResult(set(), set())
-        assert expected_result.to_attacker == result.to_attacker
-        assert expected_result.to_defender == result.to_defender
+class DamageResult(TypedDict):
+    to_attacker: int
+    to_defender: int
 
 
-class TestApplyTentacleDamage:
-    def test_wa_je(self):
-        result = apply_tentacle_damage(unit.Warrior(), unit.Jelly())
-        expected_result = (unit.Warrior(50), 50)
-
-        assert expected_result[0] == result[0]
-        assert expected_result[1] == result[1]
-
-    def test_je_je(self):
-        result = apply_tentacle_damage(unit.Jelly(), unit.Jelly())
-        ex_je = unit.Jelly()
-        ex_je.add_status_effect(StatusEffect.TAKES_RETALIATION)
-        expected_result = (ex_je, 0)
-
-        assert expected_result[0] == result[0]
-        assert expected_result[1] == result[1]
-
-    def test_ar_je(self):
-        result = apply_tentacle_damage(unit.Archer(), unit.Jelly())
-        expected_result = (
-            unit.Archer(),
-            0,
-        )
-
-        assert expected_result[0] == result[0]
-        assert expected_result[1] == result[1]
+class StatusEffectResult(TypedDict):
+    to_attacker: list[str]
+    to_defender: list[str]
 
 
-class TestSingleCombat:
-    def test_wa_wa(self):
-        result = single_combat(unit.Warrior(), unit.Warrior())
-        expected_result = CombatResult(
-            DamageResult(50, 50),
-            StatusEffectResult(set(), set()),
-        )
-        assert result.damage.to_attacker == expected_result.damage.to_attacker
-        assert result.damage.to_defender == expected_result.damage.to_defender
-        assert (
-            result.status_effects.to_attacker
-            == expected_result.status_effects.to_attacker
-        )
-        assert (
-            result.status_effects.to_defender
-            == expected_result.status_effects.to_defender
-        )
+class SingleCombatData(TypedDict):
+    attacker: str
+    defender: str
+    damage: DamageResult
+    effects: StatusEffectResult
 
-    def test_wa_wa_d(self):
-        wa_d = unit.Warrior()
-        wa_d.add_status_effect(StatusEffect.FORTIFIED)
-        result = single_combat(unit.Warrior(), wa_d)
-        expected_result = CombatResult(
-            DamageResult(to_attacker=50, to_defender=40),
-            StatusEffectResult(to_attacker=set(), to_defender=set()),
-        )
-        assert result.damage.to_attacker == expected_result.damage.to_attacker
-        assert result.damage.to_defender == expected_result.damage.to_defender
-        assert (
-            result.status_effects.to_attacker
-            == expected_result.status_effects.to_attacker
-        )
-        assert (
-            result.status_effects.to_defender
-            == expected_result.status_effects.to_defender
-        )
 
-    def test_wa_d_wa_d(self):
-        wa_d1 = unit.Warrior()
-        wa_d1.add_status_effect(StatusEffect.FORTIFIED)
-        wa_d2 = unit.Warrior()
-        wa_d2.add_status_effect(StatusEffect.FORTIFIED)
-        result = single_combat(wa_d1, wa_d2)
-        expected_result = CombatResult(
-            DamageResult(to_attacker=50, to_defender=40),
-            StatusEffectResult(to_attacker=set(), to_defender=set()),
-        )
-        assert result.damage.to_attacker == expected_result.damage.to_attacker
-        assert result.damage.to_defender == expected_result.damage.to_defender
-        assert (
-            result.status_effects.to_attacker
-            == expected_result.status_effects.to_attacker
-        )
-        assert (
-            result.status_effects.to_defender
-            == expected_result.status_effects.to_defender
-        )
+def parse_single(
+    data: SingleCombatData,
+) -> tuple[unit.Unit, unit.Unit, combat.CombatResult]:
+    attacker = unit.parse_unit(data["attacker"])
+    if attacker is None:
+        raise ValueError(f"Invalid attacker: {data['attacker']}")
+    defender = unit.parse_unit(data["defender"])
+    if defender is None:
+        raise ValueError(f"Invalid defender: {data['defender']}")
+    result = combat.CombatResult(
+        combat.DamageResult(
+            data["damage"]["to_attacker"], data["damage"]["to_defender"]
+        ),
+        combat.StatusEffectResult(
+            set(StatusEffect(e) for e in data["effects"]["to_attacker"]),
+            set(StatusEffect(e) for e in data["effects"]["to_defender"]),
+        ),
+    )
+    return attacker, defender, result
 
-    def test_wa_je(self):
-        result = single_combat(unit.Warrior(), unit.Jelly())
-        expected_result = CombatResult(
-            damage=DamageResult(to_attacker=50, to_defender=30),
-            status_effects=StatusEffectResult(to_attacker=set(), to_defender=set()),
-        )
-        assert result.damage.to_attacker == expected_result.damage.to_attacker
-        assert result.damage.to_defender == expected_result.damage.to_defender
-        assert (
-            result.status_effects.to_attacker
-            == expected_result.status_effects.to_attacker
-        )
-        assert (
-            result.status_effects.to_defender
-            == expected_result.status_effects.to_defender
-        )
 
-    def test_je_wa(self):
-        result = single_combat(unit.Jelly(), unit.Warrior(50))
-        expected_result = CombatResult(
-            damage=DamageResult(to_attacker=0, to_defender=60),
-            status_effects=StatusEffectResult(to_attacker=set(), to_defender=set()),
-        )
-        assert result.damage.to_defender == expected_result.damage.to_defender
-        assert (
-            result.status_effects.to_attacker
-            == expected_result.status_effects.to_attacker
-        )
-        assert (
-            result.status_effects.to_defender
-            == expected_result.status_effects.to_defender
-        )
+single_combat_data_path = (
+    Path(__file__).parent / "resources" / "single_combat_data.yaml"
+)
 
-    def test_je_je(self):
-        result = single_combat(unit.Jelly(), unit.Jelly())
-        expected_result = CombatResult(
-            damage=DamageResult(to_attacker=50, to_defender=50),
-            status_effects=StatusEffectResult(to_attacker=set(), to_defender=set()),
-        )
-        assert result.damage.to_attacker == expected_result.damage.to_attacker
-        assert result.damage.to_defender == expected_result.damage.to_defender
-        assert (
-            result.status_effects.to_attacker
-            == expected_result.status_effects.to_attacker
-        )
-        assert (
-            result.status_effects.to_defender
-            == expected_result.status_effects.to_defender
-        )
+single_combat_data: list[tuple[unit.Unit, unit.Unit, combat.CombatResult]] = [
+    parse_single(tup) for tup in yaml.safe_load(open(single_combat_data_path, "r"))
+]
 
-    def test_damaged_je_damaged_je_one(self):
-        result = single_combat(unit.Jelly(150), unit.Jelly(190))
-        expected_result = CombatResult(
-            damage=DamageResult(to_attacker=50, to_defender=40),
-            status_effects=StatusEffectResult(to_attacker=set(), to_defender=set()),
-        )
-        assert result.damage.to_attacker == expected_result.damage.to_attacker
-        assert result.damage.to_defender == expected_result.damage.to_defender
-        assert (
-            result.status_effects.to_attacker
-            == expected_result.status_effects.to_attacker
-        )
-        assert (
-            result.status_effects.to_defender
-            == expected_result.status_effects.to_defender
-        )
 
-    def test_damaged_je_damaged_je_two(self):
-        result = single_combat(unit.Jelly(150), unit.Jelly(100))
-        expected_result = CombatResult(
-            damage=DamageResult(to_attacker=40, to_defender=50),
-            status_effects=StatusEffectResult(to_attacker=set(), to_defender=set()),
-        )
-        assert result.damage.to_attacker == expected_result.damage.to_attacker
-        assert result.damage.to_defender == expected_result.damage.to_defender
-        assert (
-            result.status_effects.to_attacker
-            == expected_result.status_effects.to_attacker
-        )
-        assert (
-            result.status_effects.to_defender
-            == expected_result.status_effects.to_defender
-        )
+class CombatResult(TypedDict):
+    damage: int
+    effects: list[str]
 
-    def test_damaged_je_damaged_je_three(self):
-        result = single_combat(unit.Jelly(110), unit.Jelly(70))
-        expected_result = CombatResult(
-            damage=DamageResult(to_attacker=40, to_defender=60),
-            status_effects=StatusEffectResult(to_attacker=set(), to_defender=set()),
-        )
-        assert result.damage.to_attacker == expected_result.damage.to_attacker
-        assert result.damage.to_defender == expected_result.damage.to_defender
-        assert (
-            result.status_effects.to_attacker
-            == expected_result.status_effects.to_attacker
-        )
-        assert (
-            result.status_effects.to_defender
-            == expected_result.status_effects.to_defender
-        )
 
-    def test_damaged_je_damaged_je_four(self):
-        result = single_combat(
-            unit.Jelly(70),
-            unit.Jelly(30),
-        )
-        expected_result = CombatResult(
-            damage=DamageResult(to_attacker=30, to_defender=60),
-            status_effects=StatusEffectResult(to_attacker=set(), to_defender=set()),
-        )
-        assert result.damage.to_attacker == expected_result.damage.to_attacker
-        assert result.damage.to_defender == expected_result.damage.to_defender
-        assert (
-            result.status_effects.to_attacker
-            == expected_result.status_effects.to_attacker
-        )
-        assert (
-            result.status_effects.to_defender
-            == expected_result.status_effects.to_defender
-        )
+class MultiCombatData(TypedDict):
+    attackers: list[str]
+    defenders: list[str]
+    attacker_results: list[CombatResult]
+    defender_results: list[CombatResult]
 
-    def test_ph_wa(self):
-        result = single_combat(unit.Phychi(), unit.Warrior())
-        expected_result = CombatResult(
-            damage=DamageResult(to_attacker=0, to_defender=20),
-            status_effects=StatusEffectResult(
-                to_attacker=set(), to_defender={StatusEffect.POISONED}
-            ),
-        )
-        assert result.damage.to_attacker == expected_result.damage.to_attacker
-        assert result.damage.to_defender == expected_result.damage.to_defender
-        assert (
-            result.status_effects.to_attacker
-            == expected_result.status_effects.to_attacker
-        )
-        assert (
-            result.status_effects.to_defender
-            == expected_result.status_effects.to_defender
-        )
 
-    def test_wa_ki(self):
-        result = single_combat(unit.Warrior(), unit.Kiton())
-        expected_result = CombatResult(
-            damage=DamageResult(to_attacker=80, to_defender=40),
-            status_effects=StatusEffectResult(
-                to_attacker={StatusEffect.POISONED}, to_defender=set()
-            ),
-        )
-        assert result.damage.to_attacker == expected_result.damage.to_attacker
-        assert result.damage.to_defender == expected_result.damage.to_defender
-        assert (
-            result.status_effects.to_attacker
-            == expected_result.status_effects.to_attacker
-        )
-        assert (
-            result.status_effects.to_defender
-            == expected_result.status_effects.to_defender
-        )
+def parse_multi(
+    data: MultiCombatData,
+) -> tuple[list[unit.Unit], list[unit.Unit], combat.MultiCombatResult]:
+    attackers = [unit.parse_unit(a) for a in data["attackers"]]
+    if None in attackers:
+        raise ValueError(f"Invalid attackers: {data['attackers']}")
+    defenders = [unit.parse_unit(d) for d in data["defenders"]]
+    if None in defenders:
+        raise ValueError(f"Invalid defenders: {data['defenders']}")
 
-    def test_ia_wa(self):
-        result = single_combat(unit.IceArcher(), unit.Warrior())
-        expected_result = CombatResult(
-            damage=DamageResult(to_attacker=0, to_defender=0),
-            status_effects=StatusEffectResult(
-                to_attacker=set(), to_defender={StatusEffect.FROZEN}
-            ),
-        )
-        assert result.damage.to_attacker == expected_result.damage.to_attacker
-        assert result.damage.to_defender == expected_result.damage.to_defender
-        assert (
-            result.status_effects.to_attacker
-            == expected_result.status_effects.to_attacker
-        )
-        assert (
-            result.status_effects.to_defender
-            == expected_result.status_effects.to_defender
-        )
+    attacker_results = [
+        combat.UnitResult(d["damage"], set(StatusEffect(e) for e in d["effects"]))
+        for d in data["attacker_results"]
+    ]
+    defender_results = [
+        combat.UnitResult(d["damage"], set(StatusEffect(e) for e in d["effects"]))
+        for d in data["defender_results"]
+    ]
+    return (
+        attackers,
+        defenders,
+        combat.MultiCombatResult(attacker_results, defender_results),
+    )  # type: ignore
 
-    def test_mb_wa(self):
-        result = single_combat(unit.MindBender(), unit.Warrior())
-        expected_result = CombatResult(
-            damage=DamageResult(to_attacker=0, to_defender=0),
-            status_effects=StatusEffectResult(
-                to_attacker=set(), to_defender={StatusEffect.CONVERTED}
-            ),
-        )
-        assert result.damage.to_attacker == expected_result.damage.to_attacker
-        assert result.damage.to_defender == expected_result.damage.to_defender
-        assert (
-            result.status_effects.to_attacker
-            == expected_result.status_effects.to_attacker
-        )
-        assert (
-            result.status_effects.to_defender
-            == expected_result.status_effects.to_defender
-        )
 
-    def test_sh_wa(self):
-        result = single_combat(unit.Shaman(), unit.Warrior())
-        expected_result = CombatResult(
-            damage=DamageResult(to_attacker=0, to_defender=20),
-            status_effects=StatusEffectResult(
-                to_attacker=set(), to_defender={StatusEffect.CONVERTED}
-            ),
-        )
-        assert result.damage.to_attacker == expected_result.damage.to_attacker
-        assert result.damage.to_defender == expected_result.damage.to_defender
-        assert (
-            result.status_effects.to_attacker
-            == expected_result.status_effects.to_attacker
-        )
-        assert (
-            result.status_effects.to_defender
-            == expected_result.status_effects.to_defender
-        )
+multi_combat_data_path = Path(__file__).parent / "resources" / "multi_combat_data.yaml"
 
-    def test_ar_wa(self):
-        result = single_combat(unit.Archer(), unit.Warrior())
-        expected_result = CombatResult(
-            damage=DamageResult(to_attacker=0, to_defender=50),
-            status_effects=StatusEffectResult(to_attacker=set(), to_defender=set()),
-        )
-        assert result.damage.to_attacker == expected_result.damage.to_attacker
-        assert result.damage.to_defender == expected_result.damage.to_defender
-        assert (
-            result.status_effects.to_attacker
-            == expected_result.status_effects.to_attacker
-        )
-        assert (
-            result.status_effects.to_defender
-            == expected_result.status_effects.to_defender
-        )
+multi_combat_data: list[
+    tuple[list[unit.Unit], list[unit.Unit], combat.MultiCombatResult]
+] = [parse_multi(tup) for tup in yaml.safe_load(open(multi_combat_data_path, "r"))]
+
+# endregion: Setup
+
+
+@pytest.mark.parametrize(("attacker", "defender", "expected"), single_combat_data)
+def test_single_combat(
+    attacker: unit.Unit, defender: unit.Unit, expected: combat.CombatResult
+):
+    result = combat.single_combat(attacker, defender)
+    assert result.damage.to_attacker == expected.damage.to_attacker
+    assert result.damage.to_defender == expected.damage.to_defender
+    assert result.status_effects.to_attacker == expected.status_effects.to_attacker
+    assert result.status_effects.to_defender == expected.status_effects.to_defender
+
+
+@pytest.mark.parametrize(("attackers", "defenders", "expected"), multi_combat_data)
+def test_multi_combat(
+    attackers: list[unit.Unit],
+    defenders: list[unit.Unit],
+    expected: combat.MultiCombatResult,
+):
+    result = combat.multi_combat(attackers, defenders)
+    assert len(result.attackers) == len(expected.attackers)
+    assert len(result.defenders) == len(expected.defenders)
+    for attacker_result, expected_result in zip(result.attackers, expected.attackers):
+        assert attacker_result.damage == expected_result.damage
+        assert attacker_result.status_effects == expected_result.status_effects
+    for defender_result, expected_result in zip(result.defenders, expected.defenders):
+        assert defender_result.damage == expected_result.damage
+        assert defender_result.status_effects == expected_result.status_effects

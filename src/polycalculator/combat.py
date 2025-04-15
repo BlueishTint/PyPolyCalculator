@@ -165,7 +165,7 @@ def single_combat(attacker: Unit, defender: Unit) -> CombatResult:
 
     damage = _calculate_damage(
         attacker.attack,
-        attacker.health_ratio,
+        (attacker.current_hp - tentacle_damage) / attacker.max_hp,
         defender.defense,
         defender.health_ratio,
         defender.defense_bonus,
@@ -180,6 +180,7 @@ def single_combat(attacker: Unit, defender: Unit) -> CombatResult:
         and Trait.SURPRISE not in attacker.traits
         and Trait.CONVERT not in attacker.traits
         and Trait.FREEZE not in attacker.traits
+        and Trait.TENTACLES not in attacker.traits
         and StatusEffect.FROZEN not in defender.status_effects
     )
 

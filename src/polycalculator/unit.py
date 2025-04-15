@@ -1,7 +1,7 @@
+import re
 from abc import ABC, abstractmethod
 from collections.abc import Iterable
 from importlib import resources
-import re
 from typing import TypedDict
 
 import yaml
@@ -39,8 +39,14 @@ NAVAL_UNIT_DATA: dict[str, _NavalUnitParams] = yaml.safe_load(
 class Unit(ABC):
     """Base class for all units."""
 
-    def __init__(self, current_hp: int | None = None):
+    def __init__(
+        self,
+        current_hp: int | None = None,
+        status_effects: Iterable[StatusEffect] | None = None,
+    ):
         self._status_effects: set[StatusEffect] = set()
+        if status_effects is not None:
+            self.add_status_effects(status_effects)
         if current_hp is None:
             self._current_hp = None
         elif current_hp <= 0:
@@ -254,10 +260,6 @@ class NavalUnit(Unit):
         self._unit = unit
 
     @property
-    def _base_max_hp(self) -> int:
-        return self._unit._base_max_hp
-
-    @property
     def max_hp(self) -> int:
         return self._unit.max_hp
 
@@ -296,17 +298,12 @@ def _create_naval_unit_class(
     _traits = frozenset(Trait(trait) for trait in traits)
 
     class _NavalUnit(NavalUnit):
-        def __init__(self, unit: Unit | None = None):
-            if unit is None:
-                unit = DefaultWarrior()
-            self._unit = unit
-
         @property
         def cost(self) -> int:
             return cost + self._unit.cost
 
         @property
-        def _base_max_hp(self) -> int:
+        def _base_max_hp(self) -> int:  # pragma: no cover
             return self._unit.max_hp
 
         @property
@@ -345,6 +342,7 @@ Bomber = _NavalUnitRegistry["Bomber"]
 
 
 # region Build maps
+# no cover: start
 _ABBR_OVERRIDES: dict[str, str] = yaml.safe_load(
     resources.open_text(polycalculator, "resources/abbr_overrides.yaml")
 )
@@ -398,6 +396,7 @@ _EFFECT_ABBR_MAP = {
         resources.open_text(polycalculator, "resources/effect_abbrs.yaml")
     ).items()
 }
+# no cover: stop
 # endregion Build maps
 
 

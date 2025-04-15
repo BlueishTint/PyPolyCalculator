@@ -129,7 +129,6 @@ Exida:
   range: 3
   traits:
     - poison
-    - splash
 FireDragon:
   attack: 40
   cost: 10

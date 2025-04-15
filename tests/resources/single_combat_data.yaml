@@ -1,0 +1,170 @@
+- attacker: wa
+  defender: wa
+  damage:
+    to_attacker: 50
+    to_defender: 50
+  effects:
+    to_attacker: []
+    to_defender: []
+
+- attacker: wa
+  defender: wa d
+  damage:
+    to_attacker: 50
+    to_defender: 40
+  effects:
+    to_attacker: []
+    to_defender: []
+
+- attacker: wa
+  defender: je
+  damage:
+    to_attacker: 50
+    to_defender: 30
+  effects:
+    to_attacker: []
+    to_defender: []
+
+- attacker: ar
+  defender: je
+  damage:
+    to_attacker: 0
+    to_defender: 50
+  effects:
+    to_attacker: []
+    to_defender: []
+
+- attacker: je
+  defender: wa 5
+  damage:
+    to_attacker: 0
+    to_defender: 60
+  effects:
+    to_attacker: []
+    to_defender: []
+
+- attacker: je
+  defender: je
+  damage:
+    to_attacker: 50
+    to_defender: 50
+  effects:
+    to_attacker: []
+    to_defender: []
+
+- attacker: je 15
+  defender: je 19
+  damage:
+    to_attacker: 50
+    to_defender: 40
+  effects:
+    to_attacker: []
+    to_defender: []
+
+- attacker: je 15
+  defender: je 10
+  damage:
+    to_attacker: 40
+    to_defender: 50
+  effects:
+    to_attacker: []
+    to_defender: []
+
+- attacker: je 11
+  defender: je 7
+  damage:
+    to_attacker: 40
+    to_defender: 60
+  effects:
+    to_attacker: []
+    to_defender: []
+
+- attacker: je 7
+  defender: je 3
+  damage:
+    to_attacker: 30
+    to_defender: 60
+  effects:
+    to_attacker: []
+    to_defender: []
+
+- attacker: ph
+  defender: wa
+  damage:
+    to_attacker: 0
+    to_defender: 20
+  effects:
+    to_attacker: []
+    to_defender: [ poisoned ]
+
+- attacker: wa
+  defender: ki
+  damage:
+    to_attacker: 80
+    to_defender: 40
+  effects:
+    to_attacker: [ poisoned ]
+    to_defender: []
+
+- attacker: ia
+  defender: wa
+  damage:
+    to_attacker: 0
+    to_defender: 0
+  effects:
+    to_attacker: []
+    to_defender: [ frozen ]
+
+- attacker: mb
+  defender: wa
+  damage:
+    to_attacker: 0
+    to_defender: 0
+  effects:
+    to_attacker: []
+    to_defender: [ converted ]
+
+- attacker: sh
+  defender: wa
+  damage:
+    to_attacker: 0
+    to_defender: 20
+  effects:
+    to_attacker: []
+    to_defender: [ converted ]
+
+- attacker: ar
+  defender: wa
+  damage:
+    to_attacker: 0
+    to_defender: 50
+  effects:
+    to_attacker: []
+    to_defender: []
+
+- attacker: dr
+  defender: wa
+  damage:
+    to_attacker: 0
+    to_defender: 120
+  effects:
+    to_attacker: []
+    to_defender: []
+
+- attacker: dr s
+  defender: wa
+  damage:
+    to_attacker: 0
+    to_defender: 60
+  effects:
+    to_attacker: []
+    to_defender: []
+
+- attacker: ph
+  defender: rf
+  damage:
+    to_attacker: 0
+    to_defender: 20
+  effects:
+    to_attacker: []
+    to_defender: [ poisoned ]
