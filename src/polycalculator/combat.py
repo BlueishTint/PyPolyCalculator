@@ -1,4 +1,4 @@
-from collections.abc import Collection
+from collections.abc import Collection, Container
 from typing import NamedTuple
 
 from polycalculator.status_effect import StatusEffect
@@ -7,88 +7,55 @@ from polycalculator.unit import Unit
 
 
 def _round_away_from_zero(x: float) -> int:
-    """
-    Round a Fraction away from zero (positive numbers only).
-
-    This is needed because Python's built-in round function rounds to the nearest
-    even number when the number is exactly halfway between two integers.
-    This function rounds away from zero.
-
-    Parameters
-    ----------
-    x : float
-        The number to round.
-
-    Returns
-    -------
-    int
-        The integer rounded away from zero.
-    """
     return int((x + 5) / 10) * 10
 
 
 class DamageResult(NamedTuple):
-    """
-    The result of a damage calculation.
-
-    Attributes
-    ----------
-    to_attacker : Fraction
-        The amount of damage done to the attacker.
-    to_defender : Fraction
-        The amount of damage done to the defender.
-
-    """
+    """The damage the attacker and defender will take."""
 
     to_attacker: int
+    """The damage the attacker will take."""
     to_defender: int
+    """The damage the defender will take."""
 
 
 class StatusEffectResult(NamedTuple):
-    """
-    The result of a status effect calculation.
-
-    Attributes
-    ----------
-    to_attacker : set[StatusEffect]
-        The status effects applied to the attacker.
-    to_defender : set[StatusEffect]
-        The status effects applied to the defender.
-
-    """
+    """The status effects the attacker and defender will receive."""
 
     to_attacker: set[StatusEffect]
+    """The status effects the attacker will receive."""
     to_defender: set[StatusEffect]
+    """The status effects the defender will receive."""
 
 
 class CombatResult(NamedTuple):
-    """
-    The result of a combat between two units.
-
-    Attributes
-    ----------
-    damage : DamageResult
-        The result of the damage calculation.
-    status_effects : StatusEffectResult
-        The result of the status effect calculation.
-
-    """
+    """The result of a combat between two units."""
 
     damage: DamageResult
+    """The damage the attacker and defender will take."""
     status_effects: StatusEffectResult
+    """The status effects the attacker and defender will receive."""
 
 
 class UnitResult(NamedTuple):
+    """The result of a combat for a single unit."""
+
     damage: int
+    """The damage the unit will take."""
     status_effects: set[StatusEffect]
+    """The status effects the unit will receive."""
 
 
 class MultiCombatResult(NamedTuple):
+    """The result of a battle involving more than two units."""
+
     attackers: list[UnitResult]
+    """The results of the combat for the attacking units."""
     defenders: list[UnitResult]
+    """The results of the combat for the defending units."""
 
 
-def calculate_attacker_damage(
+def _calculate_attacker_damage(
     attack: int,
     attacker_health_ratio: float,
     defense: int,
@@ -103,22 +70,7 @@ def calculate_attacker_damage(
     )
 
 
-def calculate_defender_damage(
-    defense: int,
-    defender_health_ratio: float,
-    attack: int,
-    attacker_health_ratio: float,
-    defense_bonus: float,
-) -> int:
-    return _round_away_from_zero(
-        4.5
-        * defense
-        * (effective_defense := defense * defender_health_ratio * defense_bonus)
-        / (effective_defense + attack * attacker_health_ratio)
-    )
-
-
-def calculate_damage(
+def _calculate_damage(
     attack: int,
     attacker_health_ratio: float,
     defense: int,
@@ -138,39 +90,41 @@ def calculate_damage(
     return DamageResult(defense_result, attack_result)
 
 
-def calculate_status_effects(
-    attacker: Unit, defender: Unit, takes_retaliation: bool
+def _calculate_status_effects(
+    attacker_traits: Container[Trait],
+    defender_traits: Container[Trait],
+    takes_retaliation: bool,
 ) -> StatusEffectResult:
     """
     Calculate the status effects applied to the attacker and defender.
 
     Parameters
     ----------
-    attacker : Unit
-        The attacking unit.
-    defender : Unit
-        The defending unit.
-    damage_result : DamageResult
-        The result of the damage calculation.
+    attacker_traits : Container[Trait]
+        The attacking unit's traits.
+    defender_traits : Container[Trait]
+        The defending unit's traits.
+    takes_retaliation : bool
+        Whether or not the attacker takes retaliation.
 
     Returns
     -------
     StatusEffectResult
-        The status effects applied to the attacker and defender.
+        The status effects the attacker and defender will receive.
     """
     to_attacker: set[StatusEffect] = set()
     to_defender: set[StatusEffect] = set()
 
-    if takes_retaliation and Trait.POISON in defender.traits:
+    if takes_retaliation and Trait.POISON in defender_traits:
         to_attacker.add(StatusEffect.POISONED)
 
-    if Trait.POISON in attacker.traits:
+    if Trait.POISON in attacker_traits:
         to_defender.add(StatusEffect.POISONED)
 
-    if Trait.FREEZE in attacker.traits:
+    if Trait.FREEZE in attacker_traits:
         to_defender.add(StatusEffect.FROZEN)
 
-    if Trait.CONVERT in attacker.traits:
+    if Trait.CONVERT in attacker_traits:
         to_defender.add(StatusEffect.CONVERTED)
 
     return StatusEffectResult(to_attacker, to_defender)
@@ -201,7 +155,7 @@ def single_combat(attacker: Unit, defender: Unit) -> CombatResult:
         elif attacker.range > defender.range:
             pass
         else:
-            tentacle_damage = calculate_attacker_damage(
+            tentacle_damage = _calculate_attacker_damage(
                 attacker.attack,
                 attacker.health_ratio,
                 defender.defense,
@@ -209,7 +163,7 @@ def single_combat(attacker: Unit, defender: Unit) -> CombatResult:
                 defender.defense_bonus,
             )
 
-    damage = calculate_damage(
+    damage = _calculate_damage(
         attacker.attack,
         attacker.health_ratio,
         defender.defense,
@@ -229,7 +183,9 @@ def single_combat(attacker: Unit, defender: Unit) -> CombatResult:
         and StatusEffect.FROZEN not in defender.status_effects
     )
 
-    effects = calculate_status_effects(attacker, defender, takes_retaliation)
+    effects = _calculate_status_effects(
+        attacker.traits, defender.traits, takes_retaliation
+    )
 
     damage_to_attacker = (
         tentacle_damage + (damage.to_attacker if takes_retaliation else 0)

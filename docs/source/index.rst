@@ -1,5 +1,6 @@
-Welcome to PolyCalculator's documentation!
-==========================================
+========
+Overview
+========
 
 **PolyCalculator** is a Python library that allows you to
 calculate the results of Polytopia battles using a *simple* and *intuitive* API.
@@ -10,11 +11,3 @@ how to :ref:`installation` the project.
 .. note::
 
    This project is under active development.
-
-Contents
---------
-
-.. toctree::
-
-   usage
-   api

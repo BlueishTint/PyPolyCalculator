@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from collections.abc import Iterable
 from importlib import resources
+import re
 from typing import TypedDict
 
 import yaml
@@ -10,7 +11,7 @@ from polycalculator.status_effect import StatusEffect
 from polycalculator.trait import Trait
 
 
-class UnitParams(TypedDict):
+class _UnitParams(TypedDict):
     cost: int
     hp: int
     attack: int
@@ -19,7 +20,7 @@ class UnitParams(TypedDict):
     traits: list[str]
 
 
-class NavalUnitParams(TypedDict):
+class _NavalUnitParams(TypedDict):
     attack: int
     cost: int
     defense: int
@@ -27,15 +28,17 @@ class NavalUnitParams(TypedDict):
     traits: list[str]
 
 
-UNIT_DATA: dict[str, UnitParams] = yaml.safe_load(
+UNIT_DATA: dict[str, _UnitParams] = yaml.safe_load(
     resources.open_text(polycalculator, "resources/units.yaml")
 )
-NAVAL_UNIT_DATA: dict[str, NavalUnitParams] = yaml.safe_load(
+NAVAL_UNIT_DATA: dict[str, _NavalUnitParams] = yaml.safe_load(
     resources.open_text(polycalculator, "resources/naval_units.yaml")
 )
 
 
 class Unit(ABC):
+    """Base class for all units."""
+
     def __init__(self, current_hp: int | None = None):
         self._status_effects: set[StatusEffect] = set()
         if current_hp is None:
@@ -150,6 +153,11 @@ class Unit(ABC):
         return isinstance(value, self.__class__) and self.__dict__ == value.__dict__
 
 
+def _change_name(name: str) -> str:
+    """Change a string from CamelCase to normal case."""
+    return " ".join(re.findall("[A-Z][^A-Z]*", name)).lower()
+
+
 def _create_unit_class(
     name: str,
     *,
@@ -188,52 +196,58 @@ def _create_unit_class(
             return _traits
 
     _Unit.__name__ = name
+    _Unit.__doc__ = f"Represents a {_change_name(name)} unit."
+    _Unit.__module__ = Unit.__module__
+    _Unit.__qualname__ = Unit.__qualname__.replace("Unit", name)
+    _Unit.__annotations__ = Unit.__annotations__.copy()
     return _Unit
 
 
-UnitRegistry = {
+_UnitRegistry = {
     name: _create_unit_class(name, **params) for name, params in UNIT_DATA.items()
 }
 
-DefaultWarrior = UnitRegistry["DefaultWarrior"]
-Warrior = UnitRegistry["Warrior"]
-Archer = UnitRegistry["Archer"]
-Rider = UnitRegistry["Rider"]
-Catapult = UnitRegistry["Catapult"]
-Knight = UnitRegistry["Knight"]
-Swordsman = UnitRegistry["Swordsman"]
-Defender = UnitRegistry["Defender"]
-Cloak = UnitRegistry["Cloak"]
-Dagger = UnitRegistry["Dagger"]
-MindBender = UnitRegistry["MindBender"]
-Giant = UnitRegistry["Giant"]
-Juggernaut = UnitRegistry["Juggernaut"]
-Pirate = UnitRegistry["Pirate"]
-Tridention = UnitRegistry["Tridention"]
-Shark = UnitRegistry["Shark"]
-Jelly = UnitRegistry["Jelly"]
-Puffer = UnitRegistry["Puffer"]
-Crab = UnitRegistry["Crab"]
-Polytaur = UnitRegistry["Polytaur"]
-Egg = UnitRegistry["Egg"]
-BabyDragon = UnitRegistry["BabyDragon"]
-FireDragon = UnitRegistry["FireDragon"]
-Mooni = UnitRegistry["Mooni"]
-IceArcher = UnitRegistry["IceArcher"]
-BattleSled = UnitRegistry["BattleSled"]
-IceFortress = UnitRegistry["IceFortress"]
-Gaami = UnitRegistry["Gaami"]
-Hexapod = UnitRegistry["Hexapod"]
-Doomux = UnitRegistry["Doomux"]
-Kiton = UnitRegistry["Kiton"]
-Phychi = UnitRegistry["Phychi"]
-Shaman = UnitRegistry["Shaman"]
-Exida = UnitRegistry["Exida"]
-Centipede = UnitRegistry["Centipede"]
-Segment = UnitRegistry["Segment"]
+DefaultWarrior = _UnitRegistry["DefaultWarrior"]
+Warrior = _UnitRegistry["Warrior"]
+Archer = _UnitRegistry["Archer"]
+Rider = _UnitRegistry["Rider"]
+Catapult = _UnitRegistry["Catapult"]
+Knight = _UnitRegistry["Knight"]
+Swordsman = _UnitRegistry["Swordsman"]
+Defender = _UnitRegistry["Defender"]
+Cloak = _UnitRegistry["Cloak"]
+Dagger = _UnitRegistry["Dagger"]
+MindBender = _UnitRegistry["MindBender"]
+Giant = _UnitRegistry["Giant"]
+Juggernaut = _UnitRegistry["Juggernaut"]
+Pirate = _UnitRegistry["Pirate"]
+Tridention = _UnitRegistry["Tridention"]
+Shark = _UnitRegistry["Shark"]
+Jelly = _UnitRegistry["Jelly"]
+Puffer = _UnitRegistry["Puffer"]
+Crab = _UnitRegistry["Crab"]
+Polytaur = _UnitRegistry["Polytaur"]
+Egg = _UnitRegistry["Egg"]
+BabyDragon = _UnitRegistry["BabyDragon"]
+FireDragon = _UnitRegistry["FireDragon"]
+Mooni = _UnitRegistry["Mooni"]
+IceArcher = _UnitRegistry["IceArcher"]
+BattleSled = _UnitRegistry["BattleSled"]
+IceFortress = _UnitRegistry["IceFortress"]
+Gaami = _UnitRegistry["Gaami"]
+Hexapod = _UnitRegistry["Hexapod"]
+Doomux = _UnitRegistry["Doomux"]
+Kiton = _UnitRegistry["Kiton"]
+Phychi = _UnitRegistry["Phychi"]
+Shaman = _UnitRegistry["Shaman"]
+Exida = _UnitRegistry["Exida"]
+Centipede = _UnitRegistry["Centipede"]
+Segment = _UnitRegistry["Segment"]
 
 
 class NavalUnit(Unit):
+    """Base class for all naval units."""
+
     def __init__(self, unit: Unit | None = None):
         if unit is None:
             unit = DefaultWarrior()
@@ -312,18 +326,22 @@ def _create_naval_unit_class(
             return _traits
 
     _NavalUnit.__name__ = name
+    _NavalUnit.__doc__ = f"Represents a {_change_name(name)} unit."
+    _NavalUnit.__module__ = NavalUnit.__module__
+    _NavalUnit.__qualname__ = NavalUnit.__qualname__.replace("NavalUnit", name)
+    _NavalUnit.__annotations__ = NavalUnit.__annotations__.copy()
     return _NavalUnit
 
 
-NavalUnitRegistry = {
+_NavalUnitRegistry = {
     name: _create_naval_unit_class(name, **params)
     for name, params in NAVAL_UNIT_DATA.items()
 }
 
-Raft = NavalUnitRegistry["Raft"]
-Scout = NavalUnitRegistry["Scout"]
-Rammer = NavalUnitRegistry["Rammer"]
-Bomber = NavalUnitRegistry["Bomber"]
+Raft = _NavalUnitRegistry["Raft"]
+Scout = _NavalUnitRegistry["Scout"]
+Rammer = _NavalUnitRegistry["Rammer"]
+Bomber = _NavalUnitRegistry["Bomber"]
 
 
 # region Build maps
@@ -336,42 +354,42 @@ _NAVAL_ABBR_OVERRIDES: dict[str, str] = yaml.safe_load(
 )
 _abbr_map: dict[str, type[Unit]] = {}
 
-for name, cls in set(UnitRegistry.items()).difference(
+for _name, _cls in set(_UnitRegistry.items()).difference(
     (("DefaultWarrior", DefaultWarrior),)
 ):
-    name = name.lower()
+    _name = _name.lower()
 
     # Add custom abbreviations first so they take priority
     for abbr, target_name in _ABBR_OVERRIDES.items():
-        if target_name == name:
-            _abbr_map[abbr] = cls
+        if target_name == _name:
+            _abbr_map[abbr] = _cls
 
     # Add all valid prefixes if not already overridden
-    for i in range(2, len(name) + 1):
-        abbr = name[:i]
+    for i in range(2, len(_name) + 1):
+        abbr = _name[:i]
         if abbr in _NAVAL_ABBR_OVERRIDES.keys():
             continue
         if abbr not in _abbr_map:
-            _abbr_map[abbr] = cls
+            _abbr_map[abbr] = _cls
 
 _ABBR_MAP = _abbr_map
 _naval_abbr_map: dict[str, type[NavalUnit]] = {}
 
-for name, cls in NavalUnitRegistry.items():
-    name = name.lower()
+for _name, _cls in _NavalUnitRegistry.items():
+    _name = _name.lower()
 
     # Add custom abbreviations first so they take priority
     for abbr, target_name in _NAVAL_ABBR_OVERRIDES.items():
-        if target_name == name:
-            _naval_abbr_map[abbr] = cls
+        if target_name == _name:
+            _naval_abbr_map[abbr] = _cls
 
     # Add all valid prefixes if not already overridden
-    for i in range(2, len(name) + 1):
-        abbr = name[:i]
+    for i in range(2, len(_name) + 1):
+        abbr = _name[:i]
         if abbr in _ABBR_MAP.keys():
             continue
         if abbr not in _naval_abbr_map:
-            _naval_abbr_map[abbr] = cls
+            _naval_abbr_map[abbr] = _cls
 
 _NAVAL_ABBR_MAP = _naval_abbr_map
 _EFFECT_ABBR_MAP = {

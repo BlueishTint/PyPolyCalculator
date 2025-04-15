@@ -4,8 +4,8 @@ from polycalculator.combat import (
     DamageResult,
     StatusEffectResult,
     apply_tentacle_damage,
-    calculate_damage,
-    calculate_status_effects,
+    _calculate_damage,
+    _calculate_status_effects,
     single_combat,
 )
 from polycalculator.status_effect import StatusEffect
@@ -13,13 +13,13 @@ from polycalculator.status_effect import StatusEffect
 
 class TestCalculateDamage:
     def test_wa_wa(self):
-        result = calculate_damage(unit.Warrior(), unit.Warrior())
+        result = _calculate_damage(unit.Warrior(), unit.Warrior())
         expected_result = DamageResult(50, 50)
         assert expected_result.to_attacker == result.to_attacker
         assert expected_result.to_defender == result.to_defender
 
     def test_je_je(self):
-        result = calculate_damage(unit.Jelly(), unit.Jelly())
+        result = _calculate_damage(unit.Jelly(), unit.Jelly())
         expected_result = DamageResult(50, 50)
         assert expected_result.to_attacker == result.to_attacker
         assert expected_result.to_defender == result.to_defender
@@ -28,7 +28,7 @@ class TestCalculateDamage:
         wa1 = unit.Warrior(50)
         wa2 = unit.Warrior(50)
         wa2.add_status_effect(unit.StatusEffect.FORTIFIED)
-        result = calculate_damage(wa1, wa2)
+        result = _calculate_damage(wa1, wa2)
         expected_result = DamageResult(50, 40)
         assert expected_result.to_attacker == result.to_attacker
         assert expected_result.to_defender == result.to_defender
@@ -36,7 +36,7 @@ class TestCalculateDamage:
     def test_wa_injured_wa(self):
         wa1 = unit.Warrior()
         wa2 = unit.Warrior(50)
-        result = calculate_damage(wa1, wa2)
+        result = _calculate_damage(wa1, wa2)
         expected_result = DamageResult(30, 60)
         assert expected_result.to_attacker == result.to_attacker
         assert expected_result.to_defender == result.to_defender
@@ -44,13 +44,13 @@ class TestCalculateDamage:
     def test_je_injured_wa(self):
         je = unit.Jelly()
         wa = unit.Warrior(50)
-        result = calculate_damage(je, wa)
+        result = _calculate_damage(je, wa)
         expected_result = DamageResult(30, 60)
         assert expected_result.to_attacker == result.to_attacker
         assert expected_result.to_defender == result.to_defender
 
     def test_sh_wa(self):
-        result = calculate_damage(unit.Shaman(), unit.Warrior())
+        result = _calculate_damage(unit.Shaman(), unit.Warrior())
         expected_result = DamageResult(60, 20)
         assert expected_result.to_attacker == result.to_attacker
         assert expected_result.to_defender == result.to_defender
@@ -58,25 +58,25 @@ class TestCalculateDamage:
 
 class TestCalculateStatusEffects:
     def test_wa_wa(self):
-        result = calculate_status_effects(unit.Warrior(), unit.Warrior(), True)
+        result = _calculate_status_effects(unit.Warrior(), unit.Warrior(), True)
         expected_result = StatusEffectResult(set(), set())
         assert expected_result.to_attacker == result.to_attacker
         assert expected_result.to_defender == result.to_defender
 
     def test_ph_wa(self):
-        result = calculate_status_effects(unit.Phychi(), unit.Warrior(), False)
+        result = _calculate_status_effects(unit.Phychi(), unit.Warrior(), False)
         expected_result = StatusEffectResult(set(), {StatusEffect.POISONED})
         assert expected_result.to_attacker == result.to_attacker
         assert expected_result.to_defender == result.to_defender
 
     def test_ia_wa(self):
-        result = calculate_status_effects(unit.IceArcher(), unit.Warrior(), False)
+        result = _calculate_status_effects(unit.IceArcher(), unit.Warrior(), False)
         expected_result = StatusEffectResult(set(), {StatusEffect.FROZEN})
         assert expected_result.to_attacker == result.to_attacker
         assert expected_result.to_defender == result.to_defender
 
     def test_wa_ia(self):
-        result = calculate_status_effects(unit.Warrior(), unit.IceArcher(), False)
+        result = _calculate_status_effects(unit.Warrior(), unit.IceArcher(), False)
         expected_result = StatusEffectResult(set(), set())
         assert expected_result.to_attacker == result.to_attacker
         assert expected_result.to_defender == result.to_defender

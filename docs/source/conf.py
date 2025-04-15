@@ -28,6 +28,7 @@ extensions = [
 autosummary_generate = True
 autodoc_default_options = {"members": True}
 numpydoc_class_members_toctree = False
+master_doc = "contents"
 
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3/", None),
